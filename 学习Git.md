@@ -113,10 +113,23 @@ remote repository：远程仓库
 ## Git github
 
 
+create a new repository on the command line
+```python
+echo "# git-test" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:Iridescent-zhang/git-test.git
+git push -u origin main
+```
 
-
-
-
+push an existing repository from the command line
+```python
+git remote add origin git@github.com:Iridescent-zhang/git-test.git
+git branch -M main
+git push -u origin main
+```
 
 
 
@@ -177,3 +190,4 @@ remote repository：远程仓库
 
 
 [Windows下如何解决git bash的默认home目录路径问题](https://www.cnblogs.com/songzhenhua/p/9312720.html)
+[合并冲突](https://blog.csdn.net/nonfuxinyang/article/details/77206486)
