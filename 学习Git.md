@@ -110,8 +110,70 @@ remote repository：远程仓库
 > git remote add origin git@github.com:yourName/yourRepo.git //添加远程地址, 后面的yourName和yourRepo表示你在github的用户名和仓库，加完之后进入.git，打开 config，这里会多出一个remote "origin"内容，这就是刚才添加的远程地址，也可以直接修改config来配置远程地址。
 > ```
 
-## Git github
+## Git 分支管理
+几乎每一种版本控制系统都以某种形式支持分支，一个分支代表一条独立的开发线。
+使用分支意味着你可以从开发主线上分离开来，然后在不影响主线的同时继续工作。
+![分支](https://static.runoob.com/images/svg/git-brance.svg)
 
+Git 分支实际上是指向更改快照的指针。
+
+有人把 Git 的分支模型称为必杀技特性，而正是因为它，将 Git 从版本控制系统家族里区分出来。
+当你切换分支的时候，Git 会用该分支的最后提交的快照替换你的工作目录的内容， 所以多个分支不需要多个目录。
+
+当你执行 git init 的时候，默认情况下 Git 就会为你创建 master 分支。
+**当你以此方式在上次提交更新之后创建了新分支，如果后来又有更新提交， 然后又切换到了 testing 分支，Git 将还原你的工作目录到你创建分支时候的样子。**
+
+**分支实在是太妙了，不管你在这个分支做了什么，`git checkout <branchname>`切换分支时（注意，如果你在这个分支做的改变没有commit时是无法切换到另一个已经存在的分支的，但是是可以切换到一个新建分支的(git branch \<branchname> )。），Git 将还原你的工作目录到该分支<branchbname>上一次commit时的状态(对于新分支，则是切换到原来分支创建新分支前一次提交更新时的样子)**
+
+使用分支将我们自己的工作切分开来，从而让我们能够在不同开发环境中做事，并来回切换。
+
+> **分支命令**
+>    ```python
+>    git branch //查看已有分支
+>    git branch <branchname> //新建分支
+>    git checkout <branchname> //切换分支
+>    git checkout -b <branchname> //创建新分支并立即切换到该分支下，从而在该分支中操作。
+>    git branch -d <branchname> //删除分支
+>    git rm <filename> //删除文件
+>    git add . //添加所有文件
+>    echo 'runoob.com' > test.txt //向test.txt中写入runoob.com
+>    git branch -M master //删去其他分支，主分支改名为master
+>    
+>    
+>    
+>    
+>    ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
 
 create a new repository on the command line
 ```python
@@ -130,53 +192,6 @@ git remote add origin git@github.com:Iridescent-zhang/git-test.git
 git branch -M main
 git push -u origin main
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
