@@ -142,12 +142,12 @@ Git 分支实际上是指向更改快照的指针。
 >    合并并不仅仅是简单的文件添加、移除的操作，Git 也会合并修改。
 >    git commit -v //查看当前分支是否有change没有被stage和commit
 >    git commit -am "备注" //相当于git add <filename>之后git commit -m "备注"
->    '''
+>    git status -s //该命令用于查看项目的当前状态。
+>    ```
+
 >    合并冲突出现时，需要手动去修改它，修改完之后用git add告诉Git文件冲突已经解决
 >    用git status -s查看时，冲突文件前显示UU，git add后显示M(modify)
 >    最后git commit提交。现在便成功解决了合并中的冲突，并提交了结果。
->    '''
->    git status -s //该命令用于查看项目的当前状态。
 
 push时本地分支名和远程分支名好像得一样
 
