@@ -123,7 +123,7 @@ Git 分支实际上是指向更改快照的指针。
 当你执行 git init 的时候，默认情况下 Git 就会为你创建 master 分支。
 **当你以此方式在上次提交更新之后创建了新分支，如果后来又有更新提交， 然后又切换到了 testing 分支，Git 将还原你的工作目录到你创建分支时候的样子。**
 
-**分支实在是太妙了，不管你在这个分支做了什么，`git checkout <branchname>`切换分支时（注意，如果你在这个分支做的改变没有commit时是无法切换到另一个已经存在的分支的，但是是可以切换到一个新建分支的(git branch \<branchname> )。），Git 将还原你的工作目录到该分支<branchbname>上一次commit时的状态(对于新分支，则是切换到原来分支创建新分支前一次提交更新时的样子)**
+**分支实在是太妙了，不管你在这个分支做了什么，`git checkout <branchname>`切换分支时（注意，如果你在这个分支做的改变没有commit时是无法切换到另一个已经存在的分支的，但是是可以切换到一个新建分支的(git branch \<branchname> )。），Git 将还原你的工作目录到该分支<branchbname>上一次commit时的状态(对于新分支，则是切换到原来分支创建新分支前一次提交更新时的样子) 也不大对，好像也可以切换到已存在的分支，再说吧**
 
 使用分支将我们自己的工作切分开来，从而让我们能够在不同开发环境中做事，并来回切换。
 
@@ -135,40 +135,48 @@ Git 分支实际上是指向更改快照的指针。
 >    git checkout -b <branchname> //创建新分支并立即切换到该分支下，从而在该分支中操作。
 >    git branch -d <branchname> //删除分支
 >    git rm <filename> //删除文件
->    git add . //添加所有文件
+>    git add . //添加当前项目的所有文件
 >    echo 'runoob.com' > test.txt //向test.txt中写入runoob.com
 >    git branch -M master //删去其他分支，主分支改名为master
->    
->    
->    
->    
->    ```
+>    git merge <branchname> //一旦某分支有了独立内容，你终究会希望将它合并回到你的主分支。 你可以使用该命令将任何分支合并到当前分支中去：
+>    合并并不仅仅是简单的文件添加、移除的操作，Git 也会合并修改。
+>    git commit -v //查看当前分支是否有change没有被stage和commit
+>    git commit -am "备注" //相当于git add <filename>之后git commit -m "备注"
+>    '''
+>    合并冲突出现时，需要手动去修改它，修改完之后用git add告诉Git文件冲突已经解决
+>    用git status -s查看时，冲突文件前显示UU，git add后显示M(modify)
+>    最后git commit提交。现在便成功解决了合并中的冲突，并提交了结果。
+>    '''
+>    git status -s //该命令用于查看项目的当前状态。
 
+push时本地分支名和远程分支名好像得一样
 
+## Git 查看提交历史
+Git 提交历史一般常用两个命令：
+ - git log - 查看历史提交记录。
+ - git blame <file> - 以列表形式查看指定文件的历史修改记录。
 
+### git log
+在使用 Git 提交了若干更新之后，又或者克隆了某个项目，想回顾下提交历史，我们可以使用 git log 命令查看。
+可以用 --oneline 选项来查看历史记录的简洁的版本，即`git log --oneline`
+还可以用 --graph 选项，查看历史中什么时候出现了分支、合并，即`git log --graph`
+也可以用 --reverse 参数来逆向显示所有日志，即`git log --reverse --graph`，这样从上往下是按时间顺序，没有这个参数是逆序。
+`git log --oneline --graph`很清楚
+### git blame
+如果要查看指定文件的修改记录可以使用 git blame 命令，格式如下：
+`git blame <file>`
+git blame 命令是以列表形式显示修改记录。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## git 标签
+如果你达到一个重要的阶段，并希望永远记住那个特别的提交快照，你可以使用 git tag 给它打上标签。
+ 我们可以用 `git tag -a v1.0` 命令给最新一次提交打上（HEAD）"v1.0"的标签。
+-a 选项意为"创建一个带注解的标签"。 不用 -a 选项也可以执行的，但它不会记录这标签是啥时候打的，谁打的。 我推荐一直创建带注解的标签。
+当你执行 git tag -a 命令时，Git 会打开你的编辑器，让你写一句标签注解，就像你给提交写注解一样。
+现在，注意当我们执行 `git log --decorate` 时，我们可以看到我们的标签了。
+`git log --oneline --graph --decorate`好用
+如果我们忘了给某个提交打标签，又将它发布了，我们可以给它追加标签。
+假设我们发布了提交 85fc7e7 (git log可以看到 ***commit*** 后面跟着很长的一段字符，取前七位)，但是那时候忘了给它打标签。 我们现在也可以：`git tag -a v0.9 85fc7e7`。
+如果我们要查看所有标签可以使用以下命令：`git tag`。
 
 
 
