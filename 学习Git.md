@@ -141,15 +141,19 @@ Git 分支实际上是指向更改快照的指针。
 >    git merge <branchname> //一旦某分支有了独立内容，你终究会希望将它合并回到你的主分支。 你可以使用该命令将任何分支合并到当前分支中去：
 >    合并并不仅仅是简单的文件添加、移除的操作，Git 也会合并修改。
 >    git commit -v //查看当前分支是否有change没有被stage和commit
->    git commit -am "备注" //相当于git add <filename>之后git commit -m "备注"
->    git status -s //该命令用于查看项目的当前状态。
+>    git commit -am "备注" //相当于git add <filename>之后git commit -m "备注"，commit all changed files
+>    git commit -help //该命令可以查看 commit 的命令选项。
+>    git status -s //该命令用于查看项目的当前状态，git commit -v有类似功能。
 >    ```
+`git status`显示的状态：
+??：新添加的文件未添加到index；
+A：表示这个文件添加到了缓存区；
+AM：该状态的意思是这个文件在我们将它添加到缓存之后又有了改动；
+文件修改后，我们一般都需要进行 git add 操作，从而保存历史版本。
 
 >    合并冲突出现时，需要手动去修改它，修改完之后用git add告诉Git文件冲突已经解决
 >    用git status -s查看时，冲突文件前显示UU，git add后显示M(modify)
 >    最后git commit提交。现在便成功解决了合并中的冲突，并提交了结果。
-
-push时本地分支名和远程分支名好像得一样
 
 ## Git 查看提交历史
 Git 提交历史一般常用两个命令：
@@ -178,39 +182,71 @@ git blame 命令是以列表形式显示修改记录。
 假设我们发布了提交 85fc7e7 (git log可以看到 ***commit*** 后面跟着很长的一段字符，取前七位)，但是那时候忘了给它打标签。 我们现在也可以：`git tag -a v0.9 85fc7e7`。
 如果我们要查看所有标签可以使用以下命令：`git tag`。
 
+将来无论什么时候，取某个标签的版本，就是把那个打标签的时刻的历史版本取出来。
+所以，标签也是版本库的一个快照。
+Git 的标签虽然是版本库的快照，但其实它就是指向某个 commit 的指针（跟分支很像对不对？但是分支可以移动，标签不能移动），所以，创建和删除标签都是瞬间完成的
 
+"请把上周一的那个版本打包发布，版本号是v1.2"
+"好的，按照tag v1.2查找commit就行！
+所以，tag就是一个让人容易记住的有意义的名字，它跟某个commit(commit号前七位)绑在一起。
 
+ 删除标签 git tag -d v1.1
+ 
+ ## Github
+> `git init, git add, git commit` 之后
+> 添加远程仓库:
+> `git remote add origin git@github.com:Iridescent-zhang/blog.git`
+> 查看当前的远程库:
+> `git remote, git remote -v`
+> 删除远程仓库:
+> `git remote rm [别名]`
+> 1. 从远程仓库下载新分支与数据到本地分支：
+> `git fetch`
+> 2. 从远端仓库提取数据并尝试合并到当前分支：
+> `git merge`
+>
+> 从远程仓库获取更新也可以用:
+> `git pull`
+> ![pull equal to <fetch+merge>](https://www.runoob.com/wp-content/uploads/2015/03/main-qimg-00a6b5a8ec82400657444504c4d4d1a7.png)
+> 假设你配置好了一个远程仓库[alias]，并且你想要提取更新的数据，你可以首先执行 git fetch [alias] 告诉 Git 去获取它有你没有的数据（假设有人这时候推送到服务器了），然后你可以执行 git merge [alias]/[branch] 以将服务器上的任何更新的分支合并到你的当前分支。
+> 
+> 推送你的新分支与数据到某个远端仓库命令:
+> `git push [alias] [branch]`
+> 以上命令将你的本地 [branch] 分支推送成为 [alias] 远程仓库上的 [branch] 分支，所以push时本地分支名和远程分支名得一样。
+> 
+> **执行 git fetch origin master 时，它的意思是从名为 origin 的远程上拉取名为 master 的分支到本地分支 origin/master 中。既然是拉取代码，当然需要同时指定远程名与分支名，所以分开写。**
+> ***执行 git merge origin/master 时，它的意思是合并名为 origin/master 的分支到当前所在分支。既然是分支的合并，当然就与远程名没有直接的关系，所以没有出现远程名。需要指定的是被合并的分支。***
+> **执行 git push origin master 时，它的意思是推送本地的 master 分支到远程 origin（成为远程仓库的同名master分支），涉及到远程以及分支，当然也得分开写了。**
+> 
+ ## END
+GitHub 是一个面向开源及私有软件项目的托管平台，因为只支持 Git 作为唯一的版本库格式进行托管，故名 GitHub。
+git add -A 或者 git add –all 表示追踪所有操作，包括新增、修改和删除。
+添加远程版本库命令格式：git remote add [shortname] [url]，一般shortname用origin，origin2...
+git fetch 命令将提交、文件和引用从远程存储库下载到本地存储库中。
+**git pull 其实就是 git fetch 和 git merge FETCH_HEAD 的简写。**
 
 ---
 
-create a new repository on the command line
-```python
-echo "# git-test" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin git@github.com:Iridescent-zhang/git-test.git
-git push -u origin main
-```
-
-push an existing repository from the command line
-```python
-git remote add origin git@github.com:Iridescent-zhang/git-test.git
-git branch -M main
-git push -u origin main
-```
-
-
-
-
-
-
-
-
-
-
-
+> 这是在github新建仓库时给出的代码
+> create a new repository on the command line
+> ```python
+>echo "# git-test" >> README.md
+>git init
+>git add README.md
+>git commit -m "first commit"
+>git branch -M main
+>git remote add origin git@github.com:Iridescent-zhang/git-test.git
+>git push -u origin main
+>```
+>
+>push an existing repository from the command line
+>```python
+>git remote add origin git@github.com:Iridescent-zhang/git-test.git
+>git branch -M main
+>git push -u origin main
+>```
 
 [Windows下如何解决git bash的默认home目录路径问题](https://www.cnblogs.com/songzhenhua/p/9312720.html)
 [合并冲突](https://blog.csdn.net/nonfuxinyang/article/details/77206486)
+[Runoob-Git](https://www.runoob.com/git/git-tutorial.html)
+[pull request](https://chinese.freecodecamp.org/news/how-to-make-your-first-pull-request-on-github/)
