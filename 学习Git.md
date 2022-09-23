@@ -234,7 +234,6 @@ git fetch 命令将提交、文件和引用从远程存储库下载到本地存�
 **git pull 其实就是 git fetch 和 git merge FETCH_HEAD 的简写。**
 
 ---
-
 create a new repository on the command line
 ```python
 echo "# git-test" >> README.md
@@ -254,11 +253,10 @@ git push -u origin main
 ```
 
 [Windows下如何解决git bash的默认home目录路径问题](https://www.cnblogs.com/songzhenhua/p/9312720.html)
-=======
+
 [Windows下如何解决git bash的默认home目录路径问题](https://www.cnblogs.com/songzhenhua/p/9312720.html)
 [合并冲突](https://blog.csdn.net/nonfuxinyang/article/details/77206486)
->>>>>>> dd39db44ed704e3b742b031761c8550a89eeedcc
-=======
+
 > 这是在github新建仓库时给出的代码
 > create a new repository on the command line
 > ```python
