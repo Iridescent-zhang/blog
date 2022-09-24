@@ -92,7 +92,8 @@ var FirstName='queen';//大驼峰
 var first_name='maizi';//下划线法
 
 ### JavaScript 语句
-
+---
+待续
 
 
 
