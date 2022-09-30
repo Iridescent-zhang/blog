@@ -29,7 +29,7 @@ git config --global https.proxy 127.0.0.1:1080
 > - 浏览器按F12，看哪些css, js文件没有加载上，进行调试修改；
 > - 清除浏览器缓存
 
-3. **hexo archive**(档案)界面滚动条拉到最下方会出现页面不断抖动的情况
+3. ~~**hexo archive**(档案)界面滚动条拉到最下方会出现页面不断抖动的情况~~
 >  CSS 控制Html页面高度导致抖动，这类由高度导致页面抖动的问题，其实究其根本原因是滚动条是否显示导致的。在主题下source\css\_common\scaffolding找到base.styl，添加以下代码:
 
 ```css
@@ -37,6 +37,7 @@ html,body{ overflow-y:scroll;}
 html,body{ overflow:scroll; min-height:101%;}
 html{ overflow:-moz-scrollbars-vertical;}
 ```
+> ***成小丑了，被这点坑死了，导致返回顶部按钮和目录都失效了，现在看来页面抖动应该是网络的原因***
 
 ### 配置hexo next详细教程
 [主要参考](https://minyuchengmin.github.io/2020/02/26/hexo-bo-ke-xin-ban-next-zhu-ti-da-jian/#valine-comments)
