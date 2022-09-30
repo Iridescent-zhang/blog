@@ -8,10 +8,10 @@ tags:
 ---
 
 ## 配置vscode texlive SumatraPDF环境
-<!--more-->
+
 ### 关于 TeX Live
 所谓 TeX 发行，也叫 TeX 发行版、**TeX 系统**或者 TeX 套装，指的是包括 **TeX 系统的各种可执行程序，以及他们执行时需要的一些辅助程序和宏包文档** 的集合。
-
+<!--more-->
 TeX Live 是 TUG (TeX User Group) 维护和发布的 TeX 系统，可说是「官方」的 TeX 系统。我们推荐任何阶段的 TeX 用户，都尽可能使用 TeXLive，以保持在跨操作系统平台、跨用户的一致性。
 Texlive 是 LaTex 的编译环境，提供了大量的脚本和宏包供我们使用，并且有很方便的宏包管理器可以下载更新宏包，十分方便。
 
@@ -258,6 +258,7 @@ is in the center of 天安门广场。
 > - \paragraph{·}
 > - \subparagraph{·}
 > **在report/ctexrep中，还有\chapter{·}；在文档类book/ctexbook中，还定义了\part{·}。**
+LaTeX 使用 `\section{ }、\subsection{ } 和\subsubsection{ }` 命令来定义文档章节。\section{ }命令和\paragraph{ }命令，两个的功能相似，但是\section{ }命令会自动编号，也会在目录中自动显示，而\paragraph{ }命令则不会自动编号，也不会在目录中显示。并且\paragraph{ }命令相对来说被使用的频率很少。
 
 ### 插入目录
 找到 \maketitle，在它的下面插入控制序列 \tableofcontents，保存并用 XeLaTeX 编译两次，观察效果：
@@ -313,6 +314,8 @@ LaTeX 的数学模式有两种：行内模式 (inline) 和行间模式 (display)
 ...
 \end{equation}
 ```
+
+>**公式规范及上下标**
 >```c
 >$E=mc^2$.
 >\[ E=mc^2. \]
@@ -321,7 +324,85 @@ LaTeX 的数学模式有两种：行内模式 (inline) 和行间模式 (display)
 >\end{equation}
 >```
 >这里提一下关于公式标点使用的规范。行内公式和行间公式对标点的要求是不同的：行内公式的标点，应该放在数学模式的限定符之外，而行间公式则应该放在数学模式限定符之内。
+>在数学模式中，需要表示上标，可以使用 ^ 来实现（下标则是 _）。它默认只作用于之后的一个字符，如果想对连续的几个字符起作用，请将这些字符用花括号 {} 括起来。
 
+>**根号与分式**
+>根式用 \sqrt{·} 来表示，分式用 \frac{·}{·} 来表示（第一个参数为分子，第二个为分母）。
+>可以发现，在行间公式和行内公式中，分式的输出效果是有差异的。如果要强制行内模式的分式显示为行间模式的大小，可以使用 \dfrac, 反之可以使用 \tfrac。
+>在行内写分式，你可能会喜欢 xfrac 宏包提供的 \sfrac 命令的效果。
+>排版繁分式，你应该使用 \cfrac 命令。
+
+>**运算符**
+>一些小的运算符，可以在数学模式下直接输入；另一些需要用控制序列生成，如:
+>`\[ \pm \times \div \cdot \cap \cup \geq \leq \neq \approx \equiv \]`
+>![运算符](https://i.postimg.cc/3NPr9Wm3/QQ-20220930113402.jpg)
+>连加、连乘、极限、积分等大型运算符分别用 \sum, \prod, \lim, \int 生成。他们的上下标在行内公式中被压缩，以适应行高。我们可以用 \limits 和 \nolimits 来强制显式地指定是否压缩这些上下标。
+>多重积分可以使用 \iint, \iiint, \iiiint, \idotsint 等命令输入。
+>```c
+>$ \sum_{i=1}^n i\quad \prod_{i=1}^n $
+>$ \sum\limits _{i=1}^n i\quad \prod\limits _{i=1}^n $
+>\[ \lim_{x\to0}x^2 \quad \int_a^b x^2 dx \]
+>\[ \lim\nolimits _{x\to0}x^2\quad \int\nolimits_a^b x^2 dx \]
+>```
+>![运算符](https://i.postimg.cc/Y2sq3Dzb/2.jpg)
+
+>**定界符（括号等）**
+>各种括号用 (), [], \{\}, \langle\rangle 等命令表示；注意花括号通常用来输入命令和环境的参数，所以在数学公式中它们前面要加 \。因为 LaTeX 中 | 和 \| 的应用过于随意，amsmath 宏包推荐用 \lvert\rvert 和 \lVert\rVert 取而代之。
+>为了调整这些定界符的大小，amsmath 宏包推荐使用 \big, \Big, \bigg, \Bigg 等一系列命令放在上述括号前面调整大小。
+>```c
+>\[ () \; [] \; \{\} \; \langle\rangle \; \lvert\rvert \; \lVert\rVert \]
+>\[ \Biggl(\biggl(\Bigl(\bigl((x)\bigr)\Bigr)\biggr)\Biggr) \]
+>\[ \Biggl\lVert\biggl\lVert\Bigl\lVert\bigl\lVert\lVert x
+>\rVert\bigr\rVert\Bigr\rVert\biggr\rVert\Biggr\rVert \]
+>```
+>![定界符](https://i.postimg.cc/1XDVdMNj/3.jpg)
+
+>**省略号**
+>省略号用 \dots, \cdots, \vdots, \ddots 等命令表示。\dots 和 \cdots 的纵向位置不同，前者一般用于有下标的序列。
+>`\[ x_1,x_2,\dots ,x_n\quad 1,2,\cdots ,n\quad \vdots\quad \ddots \]`
+>![省略号](https://i.postimg.cc/FFxT1x6Z/4.jpg)
+
+>**矩阵**
+>amsmath 的 pmatrix, bmatrix, Bmatrix, vmatrix, Vmatrix 等环境可以在矩阵两边加上各种分隔符。
+>```c
+>\[ \begin{pmatrix} a&b\\c&d \end{pmatrix} \quad
+>\begin{bmatrix} a&b\\c&d \end{bmatrix} \quad
+>\begin{Bmatrix} a&b\\c&d \end{Bmatrix} \quad
+>\begin{vmatrix} a&b\\c&d \end{vmatrix} \quad
+>\begin{Vmatrix} a&b\\c&d \end{Vmatrix} \]
+>```
+>![](https://liam.page/uploads/teaching/LaTeX/figures/818901c1jw1e44jpqbz2aj208k024744.jpg)
+>使用 smallmatrix 环境，可以生成行内公式的小矩阵。
+>`Marry has a little matrix $ ( \begin{smallmatrix} a&b\\c&d \end{smallmatrix} ) $.`
+>![](https://liam.page/uploads/teaching/LaTeX/figures/818901c1jw1e44jsd9ldbj20680200si.jpg)
+
+>**多行公式 公式组 分段函数**
+>需要对齐的公式，可以使用 aligned **次环境**来实现，它必须包含在数学环境之内。
+>```c
+>\[ \begin{aligned}
+>x =& a+b+c+ \\
+>&d+e+f+g
+>\end{aligned} \]
+>```
+>![](https://liam.page/uploads/teaching/LaTeX/figures/818901c1jw1e44k2acde4j205g02ft8h.jpg)
+>
+>需要对齐的公式组可以使用 align 环境，没有包括在\[ \]中间的话会带有编号。
+>```c
+>\begin{align}
+>a &= b+c+d \\
+>x &= y+z
+>\end{align}
+>```
+>![](https://i.postimg.cc/nLvHXMfm/1.jpg)
+>
+>分段函数可以用cases次环境来实现，它必须包含在数学环境之内。
+>```c
+>\[ y= \begin{cases}
+>-x,\quad x\leq 0 \\
+>x,\quad x>0
+>\end{cases} \]
+>```
+>![](https://liam.page/uploads/teaching/LaTeX/figures/818901c1jw1e44k7zto1wj205o01pt8i.jpg)
 
 建议 LaTeX 用户应当尽可能避免使用辅助工具输入数学公式。但对于急用的初学者而言，适当地使用辅助工具（而不形成依赖）也是有一些收益的。
 - https://mathpix.com/ 能够通过热键呼出截屏，而后将截屏中的公式转换成 LaTeX 数学公式的代码。
@@ -331,9 +412,27 @@ LaTeX 的数学模式有两种：行内模式 (inline) 和行间模式 (display)
 - http://detexify.kirelabs.org/classify.html 允许用户用鼠标在输入区**绘制单个数学符号的样式**，系统会根据样式返回对应的 LaTeX 代码（和所需的宏包）。这在**查询**不熟悉的数学符号时特别有用。
 
 ### 表格
+tabular 环境提供了最简单的表格功能。它用 \hline 命令表示横线，在列格式中用 | 表示竖线；用 & 来分列，用 \\ 来换行；每列可以采用居左、居中、居右等横向对齐方式，分别用 l、c、r 来表示。
+```c
+\begin{tabular}{|l|c|r|}
+ \hline
+操作系统& 发行版& 编辑器\\
+ \hline
+Windows & MikTeX & TexMakerX \\
+ \hline
+Unix/Linux & teTeX & Kile \\
+ \hline
+Mac OS & MacTeX & TeXShop \\
+ \hline
+通用& TeX Live & TeXworks \\
+ \hline
+\end{tabular}
+```
+![效果](https://liam.page/uploads/teaching/LaTeX/figures/818901c1jw1e44ku9n696j20cj05haad.jpg)
 表格也有类似的工具：[Creat LaTeX tables online](https://www.tablesgenerator.com/)
 
 ### 图片
+关于 LaTeX 插图，首先要说的是：「LaTeX 只支持 .eps 格式的图档」这个说法是错误的。
 在 LaTeX 中插入图片，有很多种方式。最好用的应当属利用graphicx宏包提供的\includegraphics命令。比如你在你的 TeX 源文件同目录下，有名为 a.jpg 的图片，你可以用这样的方式将它插入到输出文档中：
 
 ```c++
@@ -347,12 +446,75 @@ LaTeX 的数学模式有两种：行内模式 (inline) 和行间模式 (display)
 `\includegraphics[width = .8\textwidth]{a.jpg}`
 这样图片的宽度会被缩放至页面宽度的百分之八十，图片的总高度会按比例缩放。
 
+### 浮动体
+插图和表格通常需要占据大块空间，所以在文字处理软件中我们经常需要调整他们的位置。figure 和 table 环境可以自动完成这样的任务；这种自动调整位置的环境称作浮动体(float)。我们以 figure 为例。
+```c++
+\documentclass[UTF8]{ctexart}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\begin{document}
+    
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = .8\textwidth]{a.jpg}
+    \caption{有图有真相}
+    \label{fig:myphoto}
+\end{figure}
+
+\end{document}
+```
+![](https://i.postimg.cc/rm1JhDDM/2.jpg)
+htbp 选项用来指定插图的理想位置，这几个字母分别代表 here, top, bottom, float page，也就是就这里、页顶、页尾、浮动页（专门放浮动体的单独页面或分栏）。\centering 用来使插图居中；**\caption 命令设置插图标题**，LaTeX 会自动给浮动体的标题加上编号。注意 \label 应该放在标题命令之后。
+
 ### 幻灯片
 LaTeX的确还可以制作精美的幻灯片pdf，不过具体使用方法与论文写作大同小异，网上也有很多漂亮的模板。
 
-*日常写作用轻量级的Markdown，想要获得更为复杂和严谨的论文排版作品，上LaTeX，这样基本就能涵盖所有的写作场景，告别臃肿难用的word软件，让我们更专注于内容，享受其中。*
+## 版面设置
+### 页边距
+设置页边距，推荐使用 `geometry` 宏包。
+比如我希望，将纸张的长度设置为 20cm、宽度设置为 15cm、左边距 1cm、右边距 2cm、上边距 3cm、下边距 4cm，可以在**导言区**加上这样几行：
+```c
+\usepackage{geometry}
+\geometry{papersize={20cm,15cm}}
+\geometry{left=1cm,right=2cm,top=3cm,bottom=4cm}
+```
+
+### 页眉页脚
+设置页眉页脚，推荐使用 fancyhdr 宏包。
+比如我希望，在页眉左边写上我的名字，中间写上今天的日期，右边写上我的电话；页脚的正中写上页码；页眉和正文之间有一道宽为 0.4pt 的横线分割，可以在**导言区**加上如下几行：
+```c
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{lichao zhang}
+\chead{\today}
+\rhead{lczhang93@gmail.com}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headwidth}{\textwidth}
+\renewcommand{\footrulewidth}{0pt}
+```
+
+### 首行缩进
+CTeX 宏集已经处理好了首行缩进的问题（自然段前**空两格汉字宽度**）。
+因此，使用 CTeX 宏集进行中西文混合排版时，我们不需要关注首行缩进的问题。
+
+### 行间距
+我们可以通过 setspace 宏包提供的命令来调整行间距。比如在**导言区**添加如下内容，可以将行距设置为字号的 1.5 倍(这不是设置 1.5 倍行距)：
+```c
+\usepackage{setspace}
+\onehalfspacing
+```
+
+### 段间距
+我们可以通过修改长度 \parskip 的值来调整段间距。例如在**导言区**添加以下内容
+`\addtolength{\parskip}{.4em}`
+则可以在原有的基础上，增加段间距 0.4em。如果需要减小段间距，只需将该数值改为负值即可。
+
+***日常写作可以用轻量级的Markdown，想要获得更为复杂和严谨的论文排版作品，上LaTeX，这样基本就能涵盖所有的写作场景，告别臃肿难用的word软件，让我们更专注于内容，享受其中。***
 
 **参考文章**
 [LaTeX零基础入门教程](https://www.jianshu.com/p/3e842d67ada2)
-[一份其实很短的 LaTeX 入门文档](一份其实很短的 LaTeX 入门文档)
+[一份其实很短的 LaTeX 入门文档](https://liam.page/2014/09/08/latex-introduction/)
 
