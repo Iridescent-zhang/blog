@@ -60,7 +60,7 @@ Shadowsocks 和 SSR 都是当作 SOCKS5 代理服务器来突破防火长城 GFW
 ### MDN 
 [什么是网络服务器](https://developer.mozilla.org/zh-CN/docs/Learn/Common_questions/What_is_a_web_server#%E9%9D%99%E6%80%81%E5%92%8C%E5%8A%A8%E6%80%81%E5%86%85%E5%AE%B9)
 
-
+## HTTP
 HTTP一般指HTTP协议（超文本传输协议），HTTP is short for "HyperText Transfer Protocol"，是因特网上应用最为广泛的一种网络传输协议，所有WWW（World Wide Web）文件都必须遵守的标准。HTTP用于Web浏览器和Web服务器之间的通信，基于TCP/IP通信协议来传输数据（HTML文件、图片文件、查询结果等）。
 
 HTTPS 经由 HTTP 进行通信，但利用 SSL/TLS 来加密数据包。
