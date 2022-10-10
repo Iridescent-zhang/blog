@@ -219,7 +219,6 @@ Git 的标签虽然是版本库的快照，但其实它就是指向某个 commit
 > **执行 git push origin master 时，它的意思是推送本地的 master 分支到远程 origin（成为远程仓库的同名master分支），涉及到远程以及分支，当然也得分开写了。**
 > 
  ## END
-
 GitHub 是一个面向开源及私有软件项目的托管平台，因为只支持 Git 作为唯一的版本库格式进行托管，故名 GitHub。
 git add -A 或者 git add –all 表示追踪所有操作，包括新增、修改和删除。
 添加远程版本库命令格式：git remote add [shortname] [url]，一般shortname用origin，origin2...
@@ -283,6 +282,7 @@ git rebase master
 git pull <remote> master:dev将获取remote/master分支并将其合并到您的local/dev分支中。
 git pull <remote> dev将获取remote/dev分支，并将其合并到您当前的分支中。
 也可以[rebase](https://blog.csdn.net/brownsville2/article/details/102246961)
+
 
 [Windows下如何解决git bash的默认home目录路径问题](https://www.cnblogs.com/songzhenhua/p/9312720.html)
 [合并冲突](https://blog.csdn.net/nonfuxinyang/article/details/77206486)
