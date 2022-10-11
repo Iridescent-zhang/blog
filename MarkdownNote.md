@@ -12,6 +12,14 @@ tags:
 <!--more-->
 ![basic](https://img-blog.csdnimg.cn/2021080722171071.png)
 
+>```python
+> Get-History
+>```
+这样用的时候在`Get-History`和`>`中间需要有个空格。如果整个单元作为列表元素的一部分，则需要四个空格。如：
+>    ```python
+>    Get-History
+>    ```
+
 ## 扩展语法
 并非所有 Markdown 应用程序都支持这些元素。
 ![extend](https://img-blog.csdnimg.cn/20210807221747578.png)

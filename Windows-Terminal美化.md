@@ -16,12 +16,53 @@ tags:
 > 到 [Microsoft/Powershell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)寻找下载方法，我用的是：`winget`
 > 
 > 3. 安装 On My Posh
+>    最好以管理员身份运行powershell。
 >    ```console
->    winget install oh-my-posh
+>    winget install JanDeDobbeleer.OhMyPosh -s winget
 >    ```
->    编辑修改前面提到过的 `$Profile`
+>    这个下载内容包括两个东西:
+>    - oh-my-posh.exe-Windows executable
+>    这个是基于Windows系统的oh-my-posh的可执行文件, 但是点击运行没有用, 必须要在Powershell中执行。在Powershell输入on-my-posh可以运行程序，如果报错，查看path环境变量是否包含![](https://i.postimg.cc/13rzZpnj/1.jpg)如果包含的话，说明该环境变量在当前程序不起作用，重启终端即可。
+>    查看on-my-posh版本
+>        ```console
+>        on-my-posh version
+>        ```
+>    - theme
+>        oh-my-posh的主题。
+>        查看环境变量是否包含：
+>        ![](https://i.postimg.cc/XJfZXTpn/2.jpg)
+>
+>    [官方文档](https://ohmyposh.dev/docs/installation/windows)给出了oh-my-posh的更新命令, 如果是刚刚下载的那么就不需要更新了。
+>    ```console
+>     winget upgrade JanDeDobbeleer.OhMyPosh -s winget
+>    ```
 > 
-> 4. 修改字体
+> 4. 配置主题
+> 在对powershell进行个性化配置oh-my-posh的时候，powershell需要运行配置脚本文件$PROFILE，由于win11默认防止执行不信任的脚本文件，导致配置过程无法正常进行。
+> 参考[博客](https://blog.csdn.net/ahahayaa/article/details/125470163)
+> 执行命令:
+>    ```console
+>    set-ExecutionPolicy RemoteSigned 
+>    ``` 
+>    1. 使用以下这行命令进行主题的初始化, 其中jandedobbeleer是主题的名字  
+> `oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\jandedobbeleer.omp.json"`
+>    2. 主题的更换要依托于一个PROFILE脚本文件来进行
+基于PROFILE脚本文件涉及到 创建、打开、填充配置语句、执行脚本文件 四条命令
+>    - 创建PROFILE文件
+>        `New-Item -Path $PROFILE -Type File -Force`
+>    - 打开PROFILE文件    
+>        `notepad $PROFILE`
+>    - 在PROFILE文件中添加以下内容
+>        `oh-my-posh init pwsh | Invoke-Expression`
+>    - 执行PROFILE脚本文件, 通过以下这条命令   
+>        `. $PROFILE` //执行脚本文件命令
+> 更换主题，修改`$profile`文件对应主题名即可。
+>    ```console
+>    oh-my-posh init pwsh --config ~\AppData\Local\Programs\oh-my-posh\themes\atomic.omp.json | Invoke-Expression
+>    ```
+>    **建议**按照这个流程来，之前我在装了win11的新电脑配置on-my-posh的时候，与3、4两步配置流程上有点差异(但是同样的配置方法在我win10的电脑上是有效的)，导致配置完成非常怪，显示的主题无法更改且并非默认主题，并且pwsh启动时间长达5s，之后按照3、4流程走一遍还是达到了预期效果。
+> 
+> 5. 修改字体
 > On My Posh 的部分主题需要相应的字体支持，否则会出现乱码。
 > 安装`Nerd Font`系列字体。[字体下载地址](https://www.nerdfonts.com/font-downloads)
 > 我安装的是`Caskaydia Vove Nerd Font`。
@@ -31,7 +72,7 @@ tags:
 > 
 > **安装插件可以参考**[安裝新版 Oh My Posh 與插件](https://www.kwchang0831.dev/dev-env/pwsh/oh-my-posh)
 >
-> 5. 安裝 Scoop
+> 6. 安裝 Scoop
 > Scoop 就像Mac 的 Homebrew 一样让可以我们更快速地用指令行安装软件。
 > pwsh 输入
 >    ```console
@@ -39,7 +80,7 @@ tags:
 >    Invoke-WebRequest get.scoop.sh | Invoke-Expression
 >    ```
 >
-> 6. 安装插件posh-git
+> 7. 安装插件posh-git
 > posh-git 让 Git 的指令可以用 Tab 补全。
 > pwsh 输入
 >    ```console
@@ -52,7 +93,7 @@ tags:
 >    Import-Module posh-git
 >    ```
 > 
-> 7. 安装插件ZLocation
+> 8. 安装插件ZLocation
 > ZLocation 类似于 autojump 或是 Zsh-z 的插件，
 可以用关键字直接跳到想去的资料夹，比使用 `cd` 更快速。
 > 用PowerShell 输入以下指令：
@@ -69,7 +110,7 @@ tags:
 >    - 进入包含字符串`string`的文件夹（不是文件夹路径包含字符串），可以用 Tab 来选择结果，指令：`z string`
 >    - 回到之前的文件夹，指令：`z -`
 >    
-> 8. (选用) 安装NeoFetch
+> 9. (选用) 安装NeoFetch
 > NeoFetch 用来显示电脑配置。
 > 
 > 如果过去用`Install-Module` 的方式安装`Oh My Posh`，即使用`Install-Module oh-my-posh -Scope CurrentUser`，需要删除旧版本，用命令`Uninstall-Module oh-my-posh -AllVersions`，并且删除`$Profile`里的 `Import-Module oh-my-posh`，按前面的方法重新安装。
@@ -79,36 +120,36 @@ tags:
 ### 补充说明
 > 查看shell的配置文件的文件地址 
 >```console
->$profile
+> $profile
 >```
 
 > 在pwsh输入命令可以直接用vsc打开配置文件
 >```console
->code $profile
+> code $profile
 >```
 
 > Windows PowerShell `$profile` 地址
 > `~\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`
 > ```console
->oh-my-posh --init --shell pwsh --config ~\AppData\Local\Programs\oh-my-posh\themes\craver.omp.json | Invoke-Expression
+> oh-my-posh --init --shell pwsh --config ~\AppData\Local\Programs\oh-my-posh\themes\craver.omp.json | Invoke-Expression
 >```
 >
 > PowerShell 7 `$profile` 地址
 > `~\PowerShell\Microsoft.PowerShell_profile.ps1`
 > ```console
->oh-my-posh --init --shell pwsh --config ~\AppData\Local\Programs\oh-my-posh\themes\jandedobbeleer.omp.json | Invoke-Expression
+> oh-my-posh --init --shell pwsh --config ~\AppData\Local\Programs\oh-my-posh\themes\jandedobbeleer.omp.json | Invoke-Expression
 >```
 
 > 让`$profile`配置立即生效
 >```console
->. $profile
+> . $profile
 >```
 
 > 下载的 On My Posh 主题在文件夹`~\AppData\Local\Programs\oh-my-posh\themes`，里面有包括`craver.omp.json 、jandedobbeleer.omp.json`在内的许多`.omp.json`文件，修改`$profile`对应位置即可修改主题。
 > 预览主题在 [On my posh 官网](https://ohmyposh.dev/docs/themes)
 > 也可以输入命令查看
 >```console
->Get-PoshThemes
+> Get-PoshThemes
 >```
 > **随便推荐几个主题:**
 > ![1](https://i.postimg.cc/xd1Gv0nT/1.jpg)
@@ -488,12 +529,12 @@ tags:
 
 >获取当前窗口命令历史记录。  
 >```console
->Get-History
+> Get-History
 >```
 
 >显示上一个、下一个命令。
 >```console
->UpArrow DownArrow 方向键
+> UpArrow DownArrow 方向键
 >```
 
 查找
@@ -501,12 +542,12 @@ tags:
 
 > 查看powershell版本
 >```console
->$PSVersionTable
+> $PSVersionTable
 >```
 
 ## 参考文章
 [Oh My Posh：全平台终端提示符个性化工具](https://sspai.com/post/69911)
 [安裝新版 Oh My Posh 與插件](https://www.kwchang0831.dev/dev-env/pwsh/oh-my-posh)
 [有讲到Tabby](https://chaisw.cn/blog/1912.html)
-
+[](https://blog.csdn.net/ahahayaa/article/details/125470204)
 
