@@ -17,17 +17,18 @@ tags:
 > 2. 安装powershell最新版 
 > 到 [Microsoft/Powershell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)寻找下载方法，我用的是：`winget`
 > 
-> 3. 安装 On My Posh
+> 3. 安装 Oh My Posh
 >    最好以管理员身份运行powershell。
 >    ```console
 >    winget install JanDeDobbeleer.OhMyPosh -s winget
 >    ```
 >    这个下载内容包括两个东西:
 >    - oh-my-posh.exe-Windows executable
->    这个是基于Windows系统的oh-my-posh的可执行文件, 但是点击运行没有用, 必须要在Powershell中执行。在Powershell输入on-my-posh可以运行程序，如果报错，查看path环境变量是否包含![](https://i.postimg.cc/13rzZpnj/1.jpg)如果包含的话，说明该环境变量在当前程序不起作用，重启终端即可。
->    查看on-my-posh版本
+>    这个是基于Windows系统的oh-my-posh的可执行文件, 但是点击运行没有用, 必须要在Powershell中执行。在Powershell输入oh-my-posh可以运行程序，如果报错，查看path环境变量是否包含![](https://i.postimg.cc/15QHCpYd/1.jpg)
+如果包含的话，说明该环境变量在当前程序不起作用，重启终端即可。
+>    查看oh-my-posh版本
 >        ```console
->        on-my-posh version
+>        oh-my-posh version
 >        ```
 >    - theme
 >        oh-my-posh的主题。
@@ -62,10 +63,10 @@ tags:
 >    ```console
 >    oh-my-posh init pwsh --config ~\AppData\Local\Programs\oh-my-posh\themes\atomic.omp.json | Invoke-Expression
 >    ```
->    **建议**按照这个流程来，之前我在装了win11的新电脑配置on-my-posh的时候，与3、4两步配置流程上有点差异(但是同样的配置方法在我win10的电脑上是有效的)，导致配置完成非常怪，显示的主题无法更改且并非默认主题，并且pwsh启动时间长达5s，之后按照3、4流程走一遍还是达到了预期效果。
+>    **建议**按照这个流程来，之前我在装了win11的新电脑配置oh-my-posh的时候，与3、4两步配置流程上有点差异(但是同样的配置方法在我win10的电脑上是有效的)，导致配置完成非常怪，显示的主题无法更改且并非默认主题，并且pwsh启动时间长达5s，之后按照3、4流程走一遍还是达到了预期效果。
 > 
 > 5. 修改字体
-> On My Posh 的部分主题需要相应的字体支持，否则会出现乱码。
+> Oh My Posh 的部分主题需要相应的字体支持，否则会出现乱码。
 > 安装`Nerd Font`系列字体。[字体下载地址](https://www.nerdfonts.com/font-downloads)
 > 我安装的是`Caskaydia Vove Nerd Font`。
 > 在shell的配置中选择字体：
@@ -147,8 +148,8 @@ tags:
 > . $profile
 >```
 
-> 下载的 On My Posh 主题在文件夹`~\AppData\Local\Programs\oh-my-posh\themes`，里面有包括`craver.omp.json 、jandedobbeleer.omp.json`在内的许多`.omp.json`文件，修改`$profile`对应位置即可修改主题。
-> 预览主题在 [On my posh 官网](https://ohmyposh.dev/docs/themes)
+> 下载的 Oh My Posh 主题在文件夹`~\AppData\Local\Programs\oh-my-posh\themes`，里面有包括`craver.omp.json 、jandedobbeleer.omp.json`在内的许多`.omp.json`文件，修改`$profile`对应位置即可修改主题。
+> 预览主题在 [Oh my posh 官网](https://ohmyposh.dev/docs/themes)
 > 也可以输入命令查看
 >```console
 > Get-PoshThemes
