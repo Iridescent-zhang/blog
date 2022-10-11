@@ -6,7 +6,9 @@ categories:
 tags:
   - Windows
 ---
-颜值就是生产力。
+
+**颜值就是生产力**
+
 <!--more-->
 ## 美化PowerShell
 > 1. 升级 Windows Terminal
