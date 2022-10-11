@@ -552,5 +552,5 @@ tags:
 [Oh My Posh：全平台终端提示符个性化工具](https://sspai.com/post/69911)
 [安裝新版 Oh My Posh 與插件](https://www.kwchang0831.dev/dev-env/pwsh/oh-my-posh)
 [有讲到Tabby](https://chaisw.cn/blog/1912.html)
-[](https://blog.csdn.net/ahahayaa/article/details/125470204)
+[3，4步骤来源](https://blog.csdn.net/ahahayaa/article/details/125470204)
 

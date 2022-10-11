@@ -37,9 +37,11 @@ start "" "C:\Program Files (x86)\Notepad++\notepad++.exe" %*
 > 在高级系统设置中的环境变量里添加了新路径之后，若你之前打开的应用程序没关掉重启（在你没重启电脑的情况下），那你这个应用程序也可能读取不到该系统变量，所以你关掉重启该应用就好了。如果还是不行，打开cmd，输入命令 `set PATH=c`，这个命令是使你写在path中的变量立即生效，然后重启cmd验证
 > 
 
-
-
-
+有几个关于右键打开cmd 终端的网页，以后再看吧。
+首先`cmd.exe /s /k pushd "%V"`这是你右键打开cmd的命令。
+[cmd.exe /s /k pushd "%V"是什么意思](https://zhidao.baidu.com/question/549082128.html)
+[%Userprofile%\ 这个文件在哪里](https://zhidao.baidu.com/question/441785422.html)
+[右键打开CMD/命令提示符/命令窗口](http://www.bathome.net/thread-26433-1-1.html)
 
 
 
