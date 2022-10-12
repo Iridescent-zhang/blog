@@ -12,19 +12,31 @@ tags:
 <!--more-->
 ![basic](https://img-blog.csdnimg.cn/2021080722171071.png)
 
->```python
-> Get-History
->```
-这样用的时候在`Get-History`和`>`中间需要有个空格。如果整个单元作为列表元素的一部分，则需要四个空格。如：
->    ```python
->    Get-History
->    ```
+### 基本语法细节
+1. 细节1
+    ![](https://i.postimg.cc/hvnhM3k2/1.jpg)
+    这样用的时候在`Get-History`和`>`中间需要有个空格，才能达到这样的效果：
+    >```python
+    > Get-History
+    >```
+
+2. 细节2
+    如果整个代码块想要作为列表元素的一部分，则需要四个空格。如：
+    ![](https://i.postimg.cc/yxTxGyBs/2.jpg)
+    > 1. 举个栗子
+    >    ```python
+    >    Get-History
+    >    ```
+
 
 ## 扩展语法
 并非所有 Markdown 应用程序都支持这些元素。
 ![extend](https://img-blog.csdnimg.cn/20210807221747578.png)
-ps： 脚注第二行的[^1]后面一定要跟英文冒号:
-列表嵌套只需在子列表中的选项前面添加两个或四个空格即可：
+
+### 扩展语法细节
+1. 脚注第二行的[^1]后面一定要跟英文冒号: 
+2. 列表嵌套只需在子列表中的选项前面添加两个或四个空格即可
+
 ## 文档参考
 [Markdown指南](https://www.markdown.xyz/)
 [RUNOOB](https://www.runoob.com/markdown/md-tutorial.html)

@@ -92,6 +92,39 @@ moon_menu:
       ```
     **CDN**的全称是Content Delivery Network，即内容分发网络。CDN是构建在现有网络基础之上的智能虚拟网络，依靠部署在各地的边缘服务器，通过中心平台的负载均衡、内容分发、调度等功能模块，使用户就近获取所需内容，降低网络拥塞，提高用户访问响应速度和命中率。由于CDN是为加快网络访问速度而被优化的网络覆盖层，因此被形象地称为“网络加速器”。
 
+
+### 如何写博客
+1. 创建博客文章
+    ```python
+    hexo n "fileName"
+    ```
+    在目录 `博客根目录\source\_posts`会出现文件`fileName.md`，在该文件中写入你想写入的东西。
+2. 产生(generate)博客内容
+当你对文件`fileName.md`进行了更改，并且将它更新到你的博客上，执行此命令。
+    ```python
+    hexo g
+    ```
+3. 在本地查看博客内容
+    ```python
+    hexo s
+    ```
+    执行该命令后终端会显示这样的语句
+    ```python
+    ...
+    INFO  Hexo is running at http://localhost:4000/ . Press Ctrl+C to stop.
+    ```
+    意思是在本地网页`http://localhost:4000/`可以查看你的博客，你可以看到博客上出现了标题为`fileName`的文章，你对文件`fileName.md`的更改也更新到这里了。
+4. 将博客内容部署到远端
+    ```python
+    hexo d
+    ```
+    执行此命令后，博客内容便部署到了远端。比如我将博客部署到了github，我在[iridescent-zhang](https://iridescent-zhang.github.io/)这里就能看到更新的博客了。
+5. 清除hexo 缓存
+    ```python
+    hexo clean
+    ```
+    `hexo g`会产生缓存，不清除的话，有时候`hexo d`达不到预期效果，导致本地和远端显示的博客不一样。另外，`hexo d`花费较长时间，所以一般先在`hexo s`查看博客内容，确定没问题之后再部署到远端。
+
 ### 配置hexo next详细教程
 [主要参考](https://minyuchengmin.github.io/2020/02/26/hexo-bo-ke-xin-ban-next-zhu-ti-da-jian/#valine-comments)
 [含个人域名重定向和HTTPS](https://blog.shijy16.cn/2021/05/13/%E9%85%8D%E7%BD%AE/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)
