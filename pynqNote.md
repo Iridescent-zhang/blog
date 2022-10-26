@@ -30,7 +30,7 @@ Using the Python language and libraries, designers can exploit the benefits of p
 ![PYNQ-Z2 接口](https://miro.medium.com/max/720/1*UTsIblZqCsQd8BENvYPNDw.png)
 
 ### 关于 Jupyter-Notebook 
-从SD中启动实际上是运行了一个利用 ARM 处理器功能的操作系统 (Linux)，Jupyter-Notebook 是在 Linux 中运行的服务器。通过使用PC访问 Jupyter-Notebook 服务器连接到设备，现在可以再浏览器网页上编写代码，代码将在 FPGA Arm Cortex 处理器内部执行，所以基本上你可以在处理器上远程运行命令。
+从SD中启动实际上是运行了一个利用 ARM 处理器功能的操作系统 (Linux)，Jupyter-Notebook 是在 Linux 中运行的服务器。通过使用PC访问 Jupyter-Notebook 服务器连接到设备，现在可以在浏览器网页上编写代码，代码将在 FPGA Arm Cortex 处理器内部执行，所以基本上你可以在处理器上远程运行命令。
 
 ### 本节参考：
 [Umer Farooq : A PYNQ-Z2 Guide for Absolute Dummies ](https://blog.umer-farooq.com/a-pynq-z2-guide-for-absolute-dummies-part-i-fun-with-leds-and-switches-47dd76abf9a9)
