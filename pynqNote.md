@@ -413,133 +413,68 @@ HDMI输入端IP可以捕捉标准的HDMI分辨率。在HDMI资源被连接后，
 ## PYNQ Library详解 - PS and PL control
 
 
+## PYNQ Library详解 - IOP
+Zynq平台通常有多个Headers和接口，它们用来连接外部设备或者直接连接Zynq PL引脚。许多现成的外部设备都可以连接到Pmod和Arduino接口上。其他的外部设备可以通过转换器（Adapter）或者面包板（Breadboard）连接到这些端口。**需要注意的是**当我们要使用一个外部设备的时候，我们必须先**在overlay中构建一个控制器**，并提供相应的软件驱动，然后我们才能使用这个设备。
+- Arduino
+- Grove
+- Pmod
+- RPi
 
+### Arduino
+Arduino子包包含了所有**用来控制** 连接到Arduino端口的外部设备 **的驱动装置**。一个Arduino连接器可以把Arduino compatible shields连接到PL引脚上。 不过要记得**在一个overlay里必须有相应的控制器来执行对应的驱动**，这之后shield才能被使用。 Arduino引脚也可以用作通用引脚来连接传统的硬件设施。
 
+如果有的话，一个Arduino PYNQ MicroBlaze可以控制Arduino接口。这个MicroBlaze就和Pmod的MicroBlaze一样，只是有更多的AXI控制器。
 
+![](https://2192837526-files.gitbook.io/~/files/v0/b/gitbook-legacy-files/o/assets%2F-Luk3T3QoKyS_b-1joBV%2F-Luk3tukeoHpawWbVABz%2F-Luk45Tm2OOYZ-C5fpav%2F38.png?generation=1574912159325564&alt=media)
 
+正如在图标里所示，Arduino PYNQ MicroBlaze有一个PYNQ MicroBlaze子系统，一个配置开关，以及许多AXI控制器 [Arduino](https://pynqdocs.gitbook.io/pynq-tutorial/pynq-zhong-wen-zi-liao/0704pynq-library-xiang-jie-iop#arduino)。
 
+![](https://2192837526-files.gitbook.io/~/files/v0/b/gitbook-legacy-files/o/assets%2F-Luk3T3QoKyS_b-1joBV%2F-Luk3tukeoHpawWbVABz%2F-Luk45To804LALQA5LIM%2F39.png?generation=1574912159104658&alt=media)
 
+在pynq.lib.arduino包里可以找到更多有关Arduino的信息。
+https://pynq.readthedocs.io/en/latest/pynq_libraries/arduino.html
 
+### Pmod
+Pmod包是一个 使用Pmod端的外部设备 的驱动集合。
 
+### Rpi
+Rpi子包是控制 连接RPi（Raspberry Pi）接口外设 的驱动集合。
+同样的，在使用具体设备之前，我们需要加载相应的overlay上的控制器。RPi引脚也可用作通用引脚来连接传统的硬件设备。
 
+![](https://2192837526-files.gitbook.io/~/files/v0/b/gitbook-legacy-files/o/assets%2F-Luk3T3QoKyS_b-1joBV%2F-Luk3tukeoHpawWbVABz%2F-Luk45U9Z-38B3Iv8Vwl%2F50.png?generation=1574912159389267&alt=media)
 
+![](https://2192837526-files.gitbook.io/~/files/v0/b/gitbook-legacy-files/o/assets%2F-Luk3T3QoKyS_b-1joBV%2F-Luk3tukeoHpawWbVABz%2F-Luk45UBlbtSd7VpQGoz%2F51.png?generation=1574912159169195&alt=media)
 
+在pynq.lib.rpi包里可以找到更多信息。
 
+## PYNQ Library详解 - Pynq MicroBlaze
+PYNQ库提供了对子系统Pynq MicroBlaze的支持。
+它允许我们加载 预编译好的应用，并且可以在Jupyter中 创建编译 新的应用。
 
+### MicroBlaze Subsystem
+PYNQ MicroBlaze子系统 可以由 PynqMicroblaze类 进行管控，这允许我们从Python下载程序，通过执行处理器的重置信号、共享数据内存读写 和 管理中断 来进行操控。
 
+每一个 PYNQ MicroBlaze子系统 都含有一个 IOP（IO处理器），一个IOP定义了一些能被Python控制的交互与动作控制器。现在一共有三个IOP：Arduino，PMOD，Logictools。
 
+该子系统含有一个MicroBlaze处理器，AXI交互、中断控制器，一个中断请求器和外部系统接口以及BRAM、内存控制器。
 
+![](https://2192837526-files.gitbook.io/~/files/v0/b/gitbook-legacy-files/o/assets%2F-Luk3T3QoKyS_b-1joBV%2F-Luk3tukeoHpawWbVABz%2F-Luk45lutSSL0eZk-Bfp%2F52.png?generation=1574912162153238&alt=media)
 
+AXI交互控制器把MicroBlaze连接到中断控制器、中断请求器和外部接口上。
+- 中断控制器是其他连接到MicroBlaze处理器的交互/动作控制器的接口。
+- 中断请求器发送中断请求至Zynq处理系统。
+- 外部接口允许MIcroBlaze子系统与其他控制器或DDR内存进行交互。
+- BRAM保存了MicroBlaze的指令和数据。
 
+BRAM是双端口的：一个端口连接到MicroBlaze指令与数据端口，另一个连接到ARM® Cortex®-A9 通讯处理器。
 
+如果外部接口连接到了DDR内存，则DDR可以用来在子系统和PS之间传输大量数据分段。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**创建一个新的PYNQ MicroBlaze**
+学到这不学了，等到觉得学这个对以后有帮助再继续吧。[创建一个新的PYNQ MicroBlaze](https://pynqdocs.gitbook.io/pynq-tutorial/pynq-zhong-wen-zi-liao/0705pynq-library-xiang-jie-pynq-microblaze#chuang-jian-yi-ge-xin-de-pynq-microblaze)
 
 # 本文参考
 [官方文档](https://pynq.readthedocs.io/en/latest/)
 [PYNQ-Z2 中文资料](https://pynqdocs.gitbook.io/pynq-tutorial/pynq-zhong-wen-zi-liao)
+来自公众号“PYNQ开源社区”的 [PYNQ入门资料集锦](https://mp.weixin.qq.com/s/GW_Ke2wEbcr3iXlML8O12w)
+[Umer Farooq的文章](https://blog.umer-farooq.com/a-pynq-z2-guide-for-absolute-dummies-part-ii-using-verilog-and-vivado-to-burn-code-on-pynq-d856f79948b1)
