@@ -13,6 +13,8 @@ hidden: false
 [pynq-z2资料下载](http://e-elements.com/product/show/id/60.shtml)
 [TUL pynq-z2](https://www.tulembedded.com/FPGA/ProductsPYNQ-Z2.html)
 
+<!--more-->
+
 # 毕设题目
 **基于HLS的手势识别系统设计**
 Design of gesture recognition system based on High Level Synthesis
