@@ -125,9 +125,15 @@ moon_menu:
     ```
     `hexo g`会产生缓存，不清除的话，有时候`hexo d`达不到预期效果，导致本地和远端显示的博客不一样。另外，`hexo d`花费较长时间，所以一般先在`hexo s`查看博客内容，确定没问题之后再部署到远端。
 
+### 博客移植
+在新设备安装 hexo `cnpm install hexo-cli -g` ，`cnpm install` 安装一下依赖项，将原来本地站点的目录复制过来并替换原来文件即可。
+
+### 隐藏博客文章
+参考[hexo 隐藏博客](https://blog.garryde.com/archives/37712.html)
+
 ### 配置hexo next详细教程
 [主要参考](https://minyuchengmin.github.io/2020/02/26/hexo-bo-ke-xin-ban-next-zhu-ti-da-jian/#valine-comments)
 [含个人域名重定向和HTTPS](https://blog.shijy16.cn/2021/05/13/%E9%85%8D%E7%BD%AE/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)
-
+[hexo 隐藏博客](https://blog.garryde.com/archives/37712.html)
 ### something else
 [unsplash](https://unsplash.com/)*里的图片非常清爽，并且提供api服务，从中挑选博客背景图非常合适。*
