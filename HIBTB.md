@@ -131,6 +131,29 @@ moon_menu:
 ### 隐藏博客文章
 参考[hexo 隐藏博客](https://blog.garryde.com/archives/37712.html)
 
+### 在博客文章中插入图片
+[Hexo博客搭建之在文章中插入图片](https://yanyinhong.github.io/2017/05/02/How-to-insert-image-in-hexo-post/)
+1. CND引用
+将图片上传到一些免费的CDN服务中，会生成对应的url地址，直接引用即可；
+
+2. 本地引用
+博客站点的`_config.yml`文件中设置`post_asset_folder: true`，执行命令`hexo n "test"`会在source/_posts下生成test.md文件和对应的test文件夹，在test文件中可以存放图片img.jpg，在test.md中引用图片只需要使用语句`![](test/img.jpg)`，请严格按照格式，不要写成`![](/test/img.jpg)`。对于next的gemini主题我只找到了使用插件的方法，参考文章如下：
+
+为了解决既能在vscode写博客时预览，上传博客时首页和文章内都能显示图片，以及引用图片的语句不太过逆天，同时使用了两个插件，实际上没有必要，一个个安装看效果是否满足即可。
+> 插件1([hexo博客中如何插入图片](https://cloud.tencent.com/developer/article/1736563))：
+> `npm install hexo-renderer-marked`命令直接安装
+> 站点_config.yml更改配置如下
+> ```css
+> post_asset_folder: true
+> marked:
+>   prependRoot: true
+>   postAsset: true
+> ```
+
+> 插件2([Hexo博客写作与图片处理的经验](https://cloud.tencent.com/developer/article/1600295?from=article.detail.1736563))
+> 这篇文章很厉害，可以好好看看
+> `npm install hexo-image-link --save` 安装插件
+
 ### 配置hexo next详细教程
 [主要参考](https://minyuchengmin.github.io/2020/02/26/hexo-bo-ke-xin-ban-next-zhu-ti-da-jian/#valine-comments)
 [含个人域名重定向和HTTPS](https://blog.shijy16.cn/2021/05/13/%E9%85%8D%E7%BD%AE/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)

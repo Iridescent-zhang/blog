@@ -37,6 +37,8 @@ tags:
 1. 脚注第二行的[^1]后面一定要跟英文冒号: 
 2. 列表嵌套只需在子列表中的选项前面添加两个或四个空格即可
 
+`<!--more-->`: 隐藏博客首页文章大部分内容。
+
 ## 文档参考
 [Markdown指南](https://www.markdown.xyz/)
 [RUNOOB](https://www.runoob.com/markdown/md-tutorial.html)

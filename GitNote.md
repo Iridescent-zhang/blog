@@ -283,6 +283,9 @@ git pull <remote> master:dev将获取remote/master分支并将其合并到您的
 git pull <remote> dev将获取remote/dev分支，并将其合并到您当前的分支中。
 也可以[rebase](https://blog.csdn.net/brownsville2/article/details/102246961)
 
+--- 
+设置GIT根目录，也就是为了设置git配置文件的路径，方便管理；
+参考文章[如何修改git的默认路径](https://blog.51cto.com/u_15075507/3641247)
 
 [Windows下如何解决git bash的默认home目录路径问题](https://www.cnblogs.com/songzhenhua/p/9312720.html)
 [合并冲突](https://blog.csdn.net/nonfuxinyang/article/details/77206486)
