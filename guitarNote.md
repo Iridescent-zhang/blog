@@ -364,9 +364,20 @@ sus就是挂留的意思，常见的有：Dsus2，Dsus4，Csus2。
 调：调像是一首歌曲的音高吧，同一首歌旋律相同调不同，听起来也是差很多的。
 唱歌跑调指的是伴奏和唱的高度就不是一个调，显得很别扭不协调
 
-调式：围绕某一有稳定感的中心音，按一定的音程冠以组织在一起，成为一个有机的体系，成为调式。
+### 调式：
 
-所有大调的中心音都是**1 Do**，主音是Do，主和弦都是以Do为根音
+**以一个音为核心，按照一定音程关系将不同音高的若干个乐音组织在一起构成一个有机体就叫做调式。**
+
+比如C大调（C Major）是一个从C音开始的自然大调，组成的音有 **C,D,E,F,G,A,B，高音C**，是一个没有升号和降号的调。
+G大调则是以G为中心音的大调式，G自然大调音阶为 **G,A,B,C,D,E,#F,G**，
+
+调式体系包括大调与小调两种调式。根据主音（第一个音）与其上方三度音的音程来分类，三级音为大三度者为大调式，三级音为小三度者为小调式（一般情况下）。自17世纪起在欧洲音乐中占重要地位，后也应用于其他地区。
+
+**自然大、小调式**取自然音阶中任何一音为主音，分为：
+- 自然大调式（亦称大音阶）：确定主音后按**全音、全音、半音、全音、全音、全音、半音**的顺序排列而得的调式音阶，这时半音位置在调式音阶的第3与第4、第7与第8音之间，其特点为：主音与其上方三度音、六度音、七度音构成大三度、大六度及大七度音程。
+- 自然小调式（亦称小音阶）：确定主音后按**全音、半音、全音、全音、半音、全音、全音**的顺序排列而得的调式音阶，这时半音位置在调式音阶的第2与第3、第5与第6音之间。其特点为：主音与上方三度音、六度音、七度音构成小三度、小六度、小七度音程。
+
+所有大调的中心音都是**1 Do**，即主音是Do，主和弦都是以Do为根音
 自然大调没有任何的升降音，其他大调在某些音上有降音。
 
 所有小调都是以**6 La**为中心，也就是La为主音，主和弦都是以La为开头。
@@ -377,6 +388,15 @@ sus就是挂留的意思，常见的有：Dsus2，Dsus4，Csus2。
 分辨是大调还是小调：大调的第一个和弦一般是以大调大和弦为开头，比如C调是以C和弦为开头和结尾，也就是首尾呼应大调。小调一般是以小和弦开始，比如Am，Bm，Em开头，Am结束等。小调一般以**La 6**为结束音，大调一般以**Do 1**为结束音，但开头的话不一定。
 
 ![](guitarNote/60.png)
+
+### 和弦
+
+[吉他C大调和弦总结](https://xshcloudy.gitee.io/blog/uncategorized/%E5%90%89%E4%BB%96C%E5%A4%A7%E8%B0%83%E5%92%8C%E5%BC%A6%E6%80%BB%E7%BB%93/) 写的不错
+
+和弦图怎么看：竖线从左到右是六弦，五弦···一弦；从上到下看品格，分别是一品，二品···五品，相当于吉他竖起来正面面对你你所看到的。最上方有叉和圆圈，圆圈代表有可能会发音，叉代表不管什么情况下，这个和弦的这根弦都不能发音。如果六弦上打叉了，可以用大拇指轻触它，即使不小心碰到也只能发出哑音。
+下图是另一种和弦图的表示方法，就和正常六线谱一样了。
+
+![](guitarNote/66.png)
 
 # 元子弹吉他
 
@@ -391,6 +411,9 @@ sus就是挂留的意思，常见的有：Dsus2，Dsus4，Csus2。
 **左手：**
 两种握法：
 现代弦握法和古典弦握法。
+
+现代握法手指要斜向，这样才能伸得远，如果小鱼际碰到了琴颈，太垂直了手指就不好张开，够不到高品格的。
+
 左手手指的数字标记：
 食指1、中指2、无名指3、小指4、大拇指T
 左手按弦要点：
@@ -421,13 +444,50 @@ sus就是挂留的意思，常见的有：Dsus2，Dsus4，Csus2。
 
 ![](guitarNote/10.png)
 
-### 
-### 
-### 
-### 
-### 
-### 
-### 
-### 
-### 
+https://zhuanlan.zhihu.com/p/24701338
+
+https://zhuanlan.zhihu.com/p/24656377
+
+https://zhuanlan.zhihu.com/p/30127342
+
+https://zh.m.wikipedia.org/zh-hans/%E5%90%89%E4%BB%96%E5%AE%9A%E5%BC%A6
+
+https://hubguitar.com/music-theory/the-musical-alphabet
+
+http://www.798com.com/article-36990-1.html
+
+https://zhidao.baidu.com/question/25219924
+
+https://www.google.com.hk/search?q=A4+440hz%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D&oq=A4+440hz%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D&aqs=chrome..69i57j0i30i625.7254j0j7&sourceid=chrome&ie=UTF-8
+
+https://zh.m.wikipedia.org/zh/A440
+
+https://zhuanlan.zhihu.com/p/68474102
+
+https://www.google.com.hk/search?q=%E5%90%89%E4%BB%96%E6%98%AFC%E5%A4%A7%E8%B0%83%E5%90%97&oq=%E5%90%89%E4%BB%96%E6%98%AFC%E5%A4%A7%E8%B0%83%E5%90%97&aqs=chrome..69i57j0i546l5.7157j0j7&sourceid=chrome&ie=UTF-8
+
+https://zhidao.baidu.com/question/713391353111926685.html
+
+https://zhidao.baidu.com/question/502480044.html
+
+https://www.google.com.hk/search?q=D%E8%87%AA%E7%84%B6%E5%A4%A7%E8%B0%83&oq=D%E8%87%AA%E7%84%B6%E5%A4%A7%E8%B0%83&aqs=chrome..69i57.3182j0j7&sourceid=chrome&ie=UTF-8
+
+https://www.wikiwand.com/zh-cn/%E8%87%AA%E7%84%B6%E5%A4%A7%E8%B0%83
+
+https://www.google.com.hk/search?q=%E5%87%BB%E5%BC%A6%E5%A3%B0%E9%9F%B3%E5%B0%8F&oq=%E5%87%BB%E5%BC%A6%E5%A3%B0%E9%9F%B3%E5%B0%8F&aqs=chrome..69i57j0i546l5.12522j0j7&sourceid=chrome&ie=UTF-8
+
+https://www.google.com.hk/search?q=musescore%E6%80%8E%E4%B9%88%E7%94%A8&oq=musescore%E6%80%8E%E4%B9%88%E7%94%A8&aqs=chrome..69i57j69i60l3.5079j0j7&sourceid=chrome&ie=UTF-8
+
+https://zhuanlan.zhihu.com/p/43104214
+
+https://musescore.org/zh-hans/handbook
+
+https://www.google.com.hk/search?q=C%E5%A4%A7%E8%B0%83%E7%AE%80%E5%8C%96%E5%92%8C%E5%BC%A6&newwindow=1&sxsrf=AJOqlzXEFvb6EwePfOQEpy9y6LTc5BqY9g%3A1673775036273&ei=vMfDY_WpENbf2roPmcCfoAY&ved=0ahUKEwj19-Hzocn8AhXWr1YBHRngB2QQ4dUDCA8&uact=5&oq=C%E5%A4%A7%E8%B0%83%E7%AE%80%E5%8C%96%E5%92%8C%E5%BC%A6&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIFCAAQogQyBQgAEKIEMgoIABDxBBAeEKIEMgUIABCiBDoKCAAQRxDWBBCwA0oECEEYAEoECEYYAFCvD1j4FmDkF2gCcAF4AIABgwGIAcAGkgEDMC43mAEAoAEByAEKwAEB&sclient=gws-wiz-serp
+
+https://www.google.com.hk/search?q=%E5%92%8C%E5%BC%A6%E5%88%86%E7%BA%A7%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D&oq=%E5%92%8C%E5%BC%A6%E5%88%86%E7%BA%A7%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D&aqs=chrome..69i57j0i546l4.6639j0j7&sourceid=chrome&ie=UTF-8
+
+https://www.google.com.hk/search?q=%E6%B3%9B%E9%9F%B3%E5%9C%A8%E7%90%B4%E8%B0%B1%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95&oq=%E6%B3%9B%E9%9F%B3%E5%9C%A8%E7%90%B4%E8%B0%B1%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95&aqs=chrome..69i57j0i546l4.10895j0j7&sourceid=chrome&ie=UTF-8
+
+https://www.jitadaren.com/2504.html
+
 
