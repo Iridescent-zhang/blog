@@ -409,6 +409,10 @@ VDMA框图如下：
 
 VDMA支持四种同步锁相模式，分别是Genlock Master （同步锁相主模式）、Genlock Slave（同步锁相从模式）、Dynamic Genlock Master（动态同步锁相主模式）和 Dynamic Genlock Slave （动态同步锁相从模式）。VDMA 有一个写通道（ S2MM ）和一个读通道 MM2SMM2S），用户通过写通道将输入端数据写入帧缓存，通过读通道将从帧缓存中读出数据，VDMA 的每一个通道都可以选择以上四种模式中的一种。
 
+
+
+
+
 ## 驱动ov5640
 
 emio编号从54开始数，根据emio的宽度，如果宽度为2，则引脚编号分别为54、55。
@@ -420,18 +424,131 @@ OV5640 SCCB写传输协议：
 
 ID ADDRESS 由七位器件地址和一位读写控制位构成（0：写，1：读），七位在前，所以读写时需要发送不同的ID ADDRESS。
 
+
+
+
 ## 色彩空间
-YUV（YCbCr）是欧洲电视系统采用的一种颜色编码方法，Y代表明亮度（luminance或luma），也就是灰阶值，U与V表示色度，用于描述影像的饱和度与色调。RGB与YUV的转换实际上是色彩空间的转换，即将RGB的三原色色彩空间转换为YUV所代表的亮度与色度的色彩空间模型。YUV主要用于模拟系统，而YCbCr则是经过校正的主要应用于数字视频中的一种编码方法，YCbCr适用于计算机用的显示器。
-RGB着重于人眼对色彩的感知，YUV则着重于视觉对于亮度的敏感程度。
+
+YUV（YCbCr）是欧洲电视系统采用的一种颜色编码方法，**Y代表明亮度**（luminance或luma），也就是灰阶值，**U与V表示色度**，用于描述影像的饱和度与色调。RGB与YUV的转换实际上是**色彩空间的转换**，即将RGB的三原色色彩空间转换为YUV所代表的亮度与色度的色彩空间模型。YUV主要用于模拟系统，而YCbCr则是经过校正的主要应用于数字视频中的一种编码方法，**YCbCr适用于计算机用的显示器**。
+RGB着重于人眼对色彩的感知，YUV则着重于视觉对于亮度的敏感程度。。使用 YUV 描述图像的好处在于，（ 1）亮度 Y 与色度 U、V 是独立的 ；（2）人眼能够识别数千种不同的色彩，但只能识别 20多种灰阶值，采用 YUV 标准可以降低数字彩色图像所需的储存容量。因而 数字彩色图像所需的储存容量。因而YUV 在数字图像处理中是一种很常用的颜色标准。
+
+YUV信号的提出，是因为国际上出现彩色电视，为了兼容黑白电视的信号而设计的， 在视频码率，压缩，兼容性 等方面有很大优势，我们最常用的主要是**YUV4:4:4**和 **YUV 4:2:2**两种采样格式的 YUV 信号。
+下面我们将介绍这两种格式的信号:
+> - YUV4:4:4
+在YUV4:4:4中，YUV 三个信道的采样率相同。因此在生成的图像里，每个像素都有各自独立的三个分量，每个分量通常为8bit，故每个像素占用3个字节。下图为 YUV444 单个像素的模型图，可以看出，每个Y都对应一组U、V数据 ，共同组成一个像素。
+![](hlsNote/5.jpg)
+> - YUV4:2:2
+在 YUV4:2:2格式中， U和 V的采样率是 Y的一半 （两个相邻的像素共用一对 U、V数据 ）。如 下图 所示，图中包含 两个相邻的像素 。第一个像素的三个YUV 分量分别是 Y1、U1、V1，第二个像素 的三个YUV 分量分别是 Y2、U1、V1，两个像素共用一组 U1、V1。
+![](hlsNote/6.jpg)
+
+YUV4:4:4格式和 YUV4:2:2格式的**数据流**也是不同的。 数据流也是不同的。如一组连续的四个像素 P1、P2、P3、P4，采用 YUV444 的采样格式时 ，数据流为 Y0 U0 V0 、Y1 U1 V1 、Y2 U2 V2 、Y3 U3 V3 ，每组数据代表一个像素点。
+而用 YUV422 的采样格式时，数据流为 **Y0 U0 Y1 V1 、Y2 U2 Y3 V3** 。其中， Y0 U0 Y1 V1 表示 P1、P2两 个像素， Y2 U2 Y3 V3 表示 P3 、P4 两个像素。
+
+![](hlsNote/7.jpg)
+
+实际上 OV5640 本身支持输出 RGB 、YUV 格式的数据，当摄像头设置为 RGB565 格式，需要显示器显示灰度图时，我们只需要将**转换后的Y值作为 R、G、B 三原色通道的输入**就可以实现了。尽管摄像头设置为RGB565格式，图像采集模块一般采用低位补0的方法使输出的数据为RGB888格式一共24位，如果采用了rgb2ycbcr模块，输出的也是24位的YCbCr数据。
+
+### 论文（连通域在复杂背景肤色检测中的应用）
+
+在对YCbCr空间和YCgCr空间中的肤色进行**建模检测**的基础上，引入连通域进行二次检测，以此消除背景中小面积类肤色区域对检测结果的影响。
+
+传统肤色检测方法主要分为两步：**颜色空间变换和肤色建模**，具有认知属性的、可以将亮度和色度分开处理的颜色空间有利于肤色检测。目前常用的色度与亮度相互独立的色彩空间有YUV，YCbCr。
+
+肤色检测获得的二值化图像中，同一目标的像素通常具有连通性，为提取肤色特征，可根据像素的连通性采用**连通域标记算法区分出不同的目标**。
+
+> - **肤色建模**
+通过分析肤色数据集中的各种肤色像素的颜色信息来确定不同肤色模型中的模型参数，将建好的模型运用到具体的图像中来判断图像中的色像素是否为肤色像素。针对YCbCr
+建立椭圆模型来对肤色进行检测。
+将肤色样本在YCbCr颜色空间中进行统计，得到分布如下：
+![](hlsNote/3.png)
+可以看出，肤色的亮度Y分布不具备聚集性，而色度分布则聚集在一个较小的范围内，如Cr值分布范围大致在100~200，Cb值大致分布在80~140之间，同时，肤色在CbCr平面的分布近似于一个椭圆，可用椭圆进行模拟。
+![](hlsNote/4.png)
+可得椭圆的表达式如下：
+![](hlsNote/5.png)
+通过此椭圆表达式即建立了一个检测肤色的椭圆模型，通过颜色空间变换后的Cb,Cr值求出x,y坐标，通过判断坐标是否位于椭圆区域之内来判断其是否属于肤色。上式左边<=1则为肤色，反之不属于肤色。此时可二值化。
+> - **肤色检测**
+以一幅复杂肤色图为例：
+![](hlsNote/2.png)
+![](hlsNote/6.png)
+通过对比发现，由于肤色中B分量较少，所以在YCgCr空间中的肤色检测效果更好，肤色散点更少，前景衣服上大部分类肤颜色并没有吴坚，在一定程度上证明了模型建立的有效性。
+
+### 论文（实时 FPGA 手势识别 算法的设计）
+
+本文从图像识别技术进行研究，从**手势边缘与肤色信息**出发，借助FPGA平台的高速特性，在**Sobel边缘提取算法**的基础上，提出利用**椭圆颜色域分离法与高斯函数加权来优化手势信息特征值提取**的算法。
+原始图像**分别**输入 **Sobel 边缘提取模块**与**色彩空间分离模块**，经处理后的信号**共同输入高斯加权模块**，**与肤色相关的边缘信息**得到加强 ，无关信息得到抑制。 该算法 结合了手势图像的色彩信息与边缘信息，经过对比验证， 表明通过对**边缘与肤色信息**的算法优化 ，能有效滤去与手势无关的信息 ，在不同光照下测试均获得足够的辨识度 。
+
+![](hlsNote/7.png)
+
+首先对手势信息的色彩域进行分析，发现手势信息色彩域集中在一个椭圆区域，为了保证一定的**环境适应性**，采用**二维高斯函数**对**手势的色彩域**进行权值计算，最后**高斯加权**到**Sobel边缘提取算法输出的边缘信息**中，实现了针对60fps下对手势边缘信息的提取和无关边缘信息的过滤。
+
+---
+
+为使用sobel算法，先将RGB信号转化为灰度值，先求Y值。
+对于色彩域分离，需要考虑将手部的肤色尽可能落在色彩空间的一小片区域里。采用YCgCr色彩空间并且修改色彩信息转换公式，摄像头获取的样本经过计算，可见手部肤色形成的聚类可近似用一个**椭圆域**进行描述。通过**二维高斯函数**使得颜色值落在此椭圆域里的像素获得较高的增益，远离此椭圆域的像素被抑制，实现了肤色的提取。
+高斯函数的拟合思路为：
+- 先求聚类区域**包络椭圆曲线**。
+- 对得到的椭圆曲线匹配相应的二维高斯函数，使在椭圆域边界处的像素的像素值对应的权值为1。
+
+![](hlsNote/8.png)
+![](hlsNote/9.png)
+
+采用的二维高斯模型为：
+
+![](hlsNote/10.png)
+![](hlsNote/11.png)
+
+---
+
+**自适应 sobel 边缘提取 模块设计**
+
+前面提到，灰度信息会从颜色域转换模块输出。灰度信息输入自适应sobel边缘提取模块，该模块**目的在于提取出图像中的所有边缘信息**。( **中值滤波**可以有效滤除脉冲噪声中值滤波可以有效滤除脉冲噪声，对高斯噪声也有一定的滤波效果，能够很好地保持边缘特性，**Sobel 算子**计算简单，对噪声有一定的平滑作用，能够提供较为准确的边缘方向信息。)
+
+sobel边缘提取算法可以参考
+
+sobel模块输出的值将通过阈值判断进行二值化处理，这里的阈值为**中值滤波的输出值**，用于实现**自适应机制**。
+
+![](hlsNote/12.png)
+
+---
+
+**加权运算模块设计**
+
+
+
+
+
 
 ## 算法
-代码的第16 行“addr_win”缓存了图像像素的灰度值，代码的第19行“hist_win”缓存了图像像素出现的个数，这里NUM_STATUS 定义成4 表示我们缓存的大小是4。代码的第58 行是读取输入像素的灰度值并存储到“tempsrc”中，代码的第59 行是通过三目运算符，判断输入图像像素值与阈值之间的大小，
+
+代码的第16 行“addr_win”缓存了图像像素的灰度值，
+代码的第19行“hist_win”缓存了图像像素出现的个数，这里NUM_STATUS 定义成4 表示我们缓存的大小是4。
+代码的第58 行是读取输入像素的灰度值并存储到“tempsrc”中，代码的第59 行是通过三目运算符，判断输入图像像素值与阈值之间的大小，
 
 用到的优化指令：
 在代码的第34 行“pragma HLS UNROLL”是HLS 优化指令，表示我们展开循环创建多个独立的操作，这将会导致我们可以在单个时钟周期里并行执行for 循环中的操作，而基于处理器的架构导致它执行这些操作步骤都是串行执行的。在FPGA 内部数据可以并行处理，这体现了用FPGA 并行加速的优势。
 
 在代码的第52 行“pragma HLS PIPELINE”是为了提高吞吐率而进行的优化。“PIPELINE”指的是流水线操作，流水线操作允许操作同时发生，任务可以不必在开始下一个操作之前完成所有操作。流水线可以应用于函数和循环。
 
+### sobel
+
+边缘检测和区域划分是图像分割的两种不同的方法，二者具有相互补充的特点。在边缘检测中，是提取图像中不连续部分的特征，根据闭合的边缘确定区域。而在区域划分中，是把图像分割成特征相同的区域，区域之间的边界就是边缘。
+
+由于边缘检测方法不需要将图像逐个像素地分割，因此更适合大图像的分割。边缘大致可以分为两种，一种是阶跃状边缘，边缘两边像素的灰度值明显不同；另一种为屋顶状边缘，边缘处于灰度值由小到大再到小的变化转折点处。边缘检测的主要工具是边缘检测模板。边缘检测的有很多，典型的有索贝尔算子、普里维特算子、罗伯茨交叉边缘检测等边缘检测技术，这里用的是sobel算子。
+
+**索贝尔算子**（Sobel operator）主要用作边缘检测，在技术上，它是一离散性差分算子，在**图像的任何一点**使用此算子，将会产生对应的**灰度矢量或是其法矢量**。
+
+![](hlsNote/2.jpg)
+
+该算子包含两组 3x3 的矩阵，分别为**横向及纵向**，将之与图像作**平面卷积**，如果以 A 代表原始图像， Gx 及 Gy 分别代表**经横向及纵向边缘检测的图像灰度值**，
+其公式如下：
+
+![](hlsNote/3.jpg)
+
+图像的**每一个像素**的**横向及纵向灰   度值**通过以下公式**结合**，来**计算该点梯度的大小**：
+
+![](hlsNote/4.jpg)
+
+如果**梯度 G 大于某一阀值**，则认为该点(x,y)为**边缘点**。
 
 
 ## C++
@@ -540,8 +657,280 @@ inline void swap1(int *a, int *b){
 
 类模板可定义一系列相关性，这些类基于在实例化时传递到类的类型参数，函数模板定义的是一系列函数，利用函数模板，你可以指定基于相同代码但作用于不同类型或类的函数集。
 
+## Some Words
+
+Accumulate   积累，累积
+accumulator  累加器
+attribute   属性
+
+bitwise      按位
+
+constructor  构造器（构造函数）
+coordinate   坐标 
+convolve/convolution     卷积
+criteria     标准  
+compatible   兼容的
+constitute   构成
+
+
+
+digilent     勤快的
+deviation    偏差  
+depict       描绘
+
+
+
+extract      提取
+enumerate    枚举
+
+
+facilitate   促进
+
+
+intensity    亮度/灰阶值
+infrastructure  基础架构
+iterative    迭代的
+
+
+
+luminence    亮度
+
+
+
+manipulate   操纵
 
 
 
 
+optimized    优化的
+optical      光学的
+
+
+
+
+parallelism  并行性
+ported       移植
+pyramidal    金字塔形的
+
+quantized    量化
+
+
+rectangle    矩形
+
+
+
+
+
+scalar       标量
+spatial      空间的 
+suppression  抑制
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## How to Use Vitis Vision Library
+
+### 准备工作
+
+在Windows的vitis补全只需要按下`alt + / `头文件和变量名都能补全出来
+
+**CFLAGS**
+-IC:\Xilinx\Vitis_Libraries\Vitis_Libraries-main\vision\L1\include -std=c++0x -II:\Professional\opencv_lib\opencv\Latest4Vitis\install\include
+
+**Linker Flags**
+-LI:\Professional\opencv_lib\opencv\Latest4Vitis\install\x64\mingw\lib -llibopencv_core470 -llibopencv_imgcodecs470 -llibopencv_imgproc470
+需要什么库自己链接就可以了
+
+### 如何编程
+
+> 基本特征
+![](hlsNote/26.png)
+---
+>看 Vitis Vision Library 文件夹包含的内容，table是重点
+[Vitis Vision Library Contents](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_0_2)
+![](hlsNote/27.png)
+---
+>看包含库函数的后文件及其对应的文件夹名，table是重点
+[Using the Vitis vision Library](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_1_3)
+![](hlsNote/28.png)
+文件夹common和core包含库函数所需要的基础设施，包括`basic functions, Mat class, and macros`，库函数按类分成四个文件夹：`features, video, dnn, and imgproc `，为了使用这些库函数，必须在VitisProject中添加文件夹的路径，之后便可以include相关的头文件，应该是要添加文件夹的路径到CFlags。
+比如，在添加上文的CFlags之后，在源文件中用这样的语句便可以添加头文件：
+![](hlsNote/29.png)
+---
+>[AXI Video Interface Functions](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_2_0)
+![](hlsNote/30.png)
+---
+>[Migrating HLS Video Library to Vitis vision]()
+HLS video视频库已经被弃用，其中所有函数和大部分的基础结构都能够在Vitis vision库中找到，但是有一些变化。
+>1. 命名空间由hls::变为xf::cv::，hls::Mat使用hls::stream存储数据但是xf::cv::Mat使用指针，所以前者无法被后者完全代替。
+![](hlsNote/31.png)
+>2. hls::window 和 hls::LineBuffer 分别由xf::cv::window 和xf::cv::LineBuffer代替，定义在**xf_video_mem.h**。
+>3. convert OpenCV Mat format to/from HLS AXI types在Vitis vision Lib中只剩下两个函数，分别是：cvMat2AXIvideo and AXIvideo2cvMat，定义在**xf_axi.h**。
+>4. convert Mat format data to/from AXI4-Stream compatible data type 的函数原来是 hls::AXIvideo2Mat and hls::Mat2AXIvideo，已经被xf::cv::AXIvideo2xfMat and xf::cv:: xfMat2AXIvideo 替换，定义在**xf_infra.hpp**。
+>5. **要使用以上这些函数，必须包含这些头文件。**
+![](hlsNote/32.png)
+---
+>**xf::cv::window**
+一个代表二维窗口缓存的模板类，使用三个参数去定义行数，列数和像素数据类型。
+类定义如下：
+>```c++
+>template<int ROWS, int COLS, typename T>
+>class Window {
+>public:
+>    Window()
+>   /* Window main APIs */
+>    void shift_pixels_left();
+>    void shift_pixels_right();
+>    void shift_pixels_up();
+>    void shift_pixels_down();
+>    void insert_pixel(T value, int row, int col);
+>    void insert_row(T value[COLS], int row);
+>    void insert_top_row(T value[COLS]);
+>    void insert_bottom_row(T value[COLS]);
+>    void insert_col(T value[ROWS], int col);
+>    void insert_left_col(T value[ROWS]);
+>    void insert_right_col(T value[ROWS]);
+>    T& getval(int row, int col);
+>    T& operator ()(int row, int col);
+>    T val[ROWS][COLS];
+>#ifdef __DEBUG__
+>    void restore_val();
+>    void window_print();
+>    T val_t[ROWS][COLS];
+>#endif
+>};
+>```
+> xf::cv::Window主要参数`val`是一个二维数组，hold the contents of buffer。
+[Member Function Description](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_2_1_3_2)
+Sample code for window buffer declaration
+>```c++
+>Window<K_ROWS, K_COLS, unsigned char> kernel;
+>```
+
+---
+
+>**xf::cv::LineBuffer**
+一个代表二维线缓存的模板类，用三个参数指定windows buffer中的行数，列数和像素数据类型。
+定义如下：
+```c++
+template<int ROWS, int COLS, typename T, XF_ramtype_e MEM_TYPE=RAM_S2P_BRAM, int RESHAPE_FACTOR=1>
+ class LineBuffer {
+public:
+    LineBuffer()
+       /* LineBuffer main APIs */
+    /* LineBuffer main APIs */
+    void shift_pixels_up(int col);
+    void shift_pixels_down(int col);
+    void insert_bottom_row(T value, int col);
+    void insert_top_row(T value, int col);
+    void get_col(T value[ROWS], int col);
+    T& getval(int row, int col);
+    T& operator ()(int row, int col);
+
+    /* Back compatible APIs */
+    void shift_up(int col);
+    void shift_down(int col);
+    void insert_bottom(T value, int col);
+    void insert_top(T value, int col);
+    T val[ROWS][COLS];
+#ifdef __DEBUG__
+    void restore_val();
+    void linebuffer_print(int col);
+    T val_t[ROWS][COLS];
+#endif
+};
+```
+>主要成员`val`表示`2-D array to hold the contents of line buffer`。
+![Member Functions Description](hlsNote/33.png)
+![Template Parameter Description](hlsNote/34.png)
+Sample code for line buffer declaration:
+>```c++
+>LineBuffer<3, 1920, XF_8UC3, RAM_S2P_URAM,1>     buff;
+>```
+
+---
+
+>[Video Processing Functions](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_2_1_5)
+这个table总结了从HLS Video库移植到Vitis Vision库中的视频处理函数。
+
+
+## 基于PYNQ软硬结合的二维手势交互设计
+
+![](hlsNote/14.png)
+
+识别的手势包括 平移，缩放
+
+手势识别部分主要实现了对提取的手势类型的识别，并对手势进行了定位操
+作，并将手势类型与定位信息传输给手势动作解析模块。
+
+手势交互控制信息的解析与输出部分主要结合手势识别的结果以及手势的位
+置信息，做出手势动作含义的解读，将手势含义解读出来并将信息输出，用于进行相应的控制操作。
+
+需要使用到两个图像缓存，一个是在采集图像时对图像进行缓存，另一个是在图像输出时对图像进行缓存。2 个VDMA 图像缓存模块
+
+![](hlsNote/15.png)
+
+![](hlsNote/16.png)
+
+![](hlsNote/17.png)
+
+![](hlsNote/18.png)
+
+![](hlsNote/19.png)
+
+![](hlsNote/20.png)
+
+![](hlsNote/21.png)
+
+![](hlsNote/22.png)
+
+![](hlsNote/23.png)
+
+![](hlsNote/24.png)
+
+![](hlsNote/25.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## HLS综合时遇到的bug
+[在 VHLS 中导出 RTL 时出现问题](https://github.com/dgschwend/zynqnet/issues/30)
+[HLS BUG](https://blog.csdn.net/Chitanda_Eru_/article/details/122287842?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-122287842-blog-122312505.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-122287842-blog-122312505.pc_relevant_default&utm_relevant_index=1)
+[HLS ERROR: [IMPL 213-28] Failed to generate IP.](https://blog.csdn.net/u014798590/article/details/122312505)
+
+![](hlsNote/13.png)
+
+通过修改版本号（原来为1.0，修改为2.0.0）解决问题，也可以插入补丁。
+参考[补丁](https://support.xilinx.com/s/article/76960?language=en_US)
+
+
+## 参考文章
+
+
+[使用 HLS 进行基于 FPGA 的边缘检测](https://www.hackster.io/adam-taylor/fpga-based-edge-detection-using-hls-192ad2)
+[同上](https://aijishu.com/a/1060000000287977)
+
+[基于Vivado HLS的Canny算法实时加速设计](https://xilinx.eetrend.com/content/2018/100014521.html) 提到行缓存和窗口缓存
 
