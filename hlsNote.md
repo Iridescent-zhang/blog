@@ -9,14 +9,14 @@ tags:
 hidden: false
 ---
 
-# 参考资料
-[pynq-z2资料下载](http://e-elements.com/product/show/id/60.shtml)
-[TUL pynq-z2](https://www.tulembedded.com/FPGA/ProductsPYNQ-Z2.html)
+要毕业咯！
 
 <!--more-->
 
 # 毕设题目
+
 **基于HLS的手势识别系统设计**
+
 Design of gesture recognition system based on High Level Synthesis
 实验室建设，硬件，难
 
@@ -201,9 +201,9 @@ for (y=0; y<480; y++) {
 
 
 
-# HLS 库
+## HLS 库
 
-## 任意精度数据类型库(arbitrary precision)
+### 任意精度数据类型库(arbitrary precision)
 **tips:** Vitis HLS 中C语言不支持任意精度数据类型库，只能在C++中使用，参考 https://support.xilinx.com/s/article/75770?language=en_US。
 
 Vitis HLS可以为C++提供整数数据类型和定点任意精度数据类型。
@@ -213,13 +213,13 @@ Vitis HLS可以为C++提供整数数据类型和定点任意精度数据类型�
 | C++ | ap_[u]int\<W>，位宽为1024，可扩展到4K位 | #include "ap_int.h" |
 | C++ | ap_[u]fixed\<W> | #include "ap_fixed.h" |
 
-### 用于 C++ 的任意整数精度类型
+#### 用于 C++ 的任意整数精度类型
 头文件ap_int.h用于为C++定义任意精度整数数据类型，要在C++中使用任意精度整数数据类型，请执行以下操作：
 1. 引入头文件 ap_int.h
 2. 针对有符号的类型将位类型更改为ap_int\<N>，针对无符号的类型使用ap_uint\<N>，其中N为范围介于1~1024之间的位大小。
 
 以下示例显示了如何添加头文件并实现 2 个变量来使用 9 位整数和 10 位无符号的整数类型：
-#include "ap_int.h"
+`#include "ap_int.h"`
 
 ```c++
 void foo_top() {
@@ -230,7 +230,7 @@ void foo_top() {
 
 **tips:** AP数据类型的劣势之一是阵列不会以0值进行自动初始化，如果需要初始化阵列，必须手动执行。
 
-### 用于 C++ 的任意精度定点数据类型
+#### 用于 C++ 的任意精度定点数据类型
 使用定点数据类型执行的C++语言 仿真的行为与综合创建的硬件的行为 相匹配，从而能够使用C语言层次快速仿真来分析位精度、量化和上溢的影响，在Vitis HLS中使用定点数据非常重要。
 
 # Vitis 使用
@@ -374,27 +374,70 @@ AXI-Stream 接口则像 FIFO 一样，数据传输时 不需要地址，在主�
 AXI4 -Lite 接口是简化版的 AXI4 接口，用于较少数据量的存储映射通信。本次实验只需要配置呼吸灯IP核的频率和 开关 ，因此接口类型选择 AXI4-Lite 接口。
 
 
-```c
-typedef struct {
-    u16 DeviceId;
-    u64 Control_BaseAddress;
-} XBreath_led_Config;
+## 基于xfOpenCV的中值滤波
 
-typedef struct {
-    u64 Control_BaseAddress;
-    u32 IsReady;
-} XBreath_led;
+图像的频率指的是空间频率，它和我们认知的物理频率是不同的。图像的频率是表征图像中**灰度变化剧烈程度**的指标，是灰度在平面空间上的梯度。不同频率信息在图像结构中有不同的作用。
 
-int XBreath_led_Initialize(XBreath_led *InstancePtr, u16 DeviceId);
-XBreath_led_Config* XBreath_led_LookupConfig(u16 DeviceId);
-int XBreath_led_CfgInitialize(XBreath_led *InstancePtr, XBreath_led_Config *ConfigPtr);
+图像的主要成分是低频信息，它形成了图像的基本灰度等级，对图像结构的决定作用较小；
+中频信息决定了图像的基本结构，形成了图像的主要边缘结构；
+高频信息形成了图像的边缘和细节，是在中频信息上对图像内容的进一步强化。
 
-void XBreath_led_Set_sw_ctrl(XBreath_led *InstancePtr, u32 Data);
-u32 XBreath_led_Get_sw_ctrl(XBreath_led *InstancePtr);
-void XBreath_led_Set_freq_step(XBreath_led *InstancePtr, u32 Data);
-u32 XBreath_led_Get_freq_step(XBreath_led *InstancePtr);
+中值滤波是一种基于排序统计理论的非线性信号处理技术，它可以消除孤立的噪声点，从而让图像中的像素值更接近真实值。红外图像中的盲元就是一种孤立噪点的例子，如下图所示：
 
+![](hlsNote/38.png)
+
+由于红外探测器制造过程中的缺陷，传感器中某些像元的输出可能会非常大，导致图像中对应的像素点非常亮，我们称之为盲元。盲元在图像中属于脉冲噪声，中值滤波对这类脉冲噪声具有良好的滤除作用，特别是在滤除噪声的同时，能够保护信号的边缘，使之不被模糊。这些优良特性是线性滤波方法所不具备的。
+
+```c++
+1  #include "ov5640_median_filter.h"
+2  
+3  void ov5640_median_filter(
+4          hls::stream< ap_axiu<24,1,1,1> >& _src,
+5          hls::stream< ap_axiu<24,1,1,1> >& _dst
+6          ){
+7  
+8  #pragma HLS INTERFACE axis register both  port=_src
+9  #pragma HLS INTERFACE axis register both  port=_dst
+10 #pragma HLS INTERFACE ap_ctrl_none port=return
+11 #pragma HLS dataflow
+12 
+13     //定义xf::mat格式变量
+14      xf::Mat<XF_8UC3, HEIGHT, WIDTH, XF_NPPC1> imgInput1;
+15      xf::Mat<XF_8UC1, HEIGHT, WIDTH, XF_NPPC1> imgGray;
+16      xf::Mat<XF_8UC1, HEIGHT, WIDTH, XF_NPPC1> imgMedian;
+17      xf::Mat<XF_8UC3, HEIGHT, WIDTH, XF_NPPC1> imgOutput1;
+18 
+19 #pragma HLS stream variable=imgInput1.data dim=1 depth=1
+20 #pragma HLS stream variable=imgGray.data   dim=1 depth=1
+21 #pragma HLS stream variable=imgMedian.data dim=1 depth=1
+22 #pragma HLS stream variable=imgOutput1.data dim=1 depth=1
+23 
+24     //将AXI Stream格式的视频转成xf::mat格式
+25     xf::AXIvideo2xfMat(_src, imgInput1);
+26 
+27     //将RGB格式图像转成灰度图像
+28     xf::rgb2gray<XF_8UC3,XF_8UC1,HEIGHT, WIDTH, XF_NPPC1>(imgInput1, imgGray);
+29 
+30     //对灰度图像进行中值滤波
+31     xf::medianBlur<3,XF_BORDER_REPLICATE,XF_8UC1,HEIGHT, WIDTH, XF_NPPC1>
+32         (imgGray, imgMedian);
+33 
+34     //将灰度图像转成RGB三个通道的灰度图像
+35     xf::gray2rgb<XF_8UC1,XF_8UC3,HEIGHT, WIDTH, XF_NPPC1>(imgMedian,imgOutput1);
+36 
+37     //将xf::mata格式的图像转成AXI Stream格式
+38     xf::xfMat2AXIvideo(imgOutput1, _dst);
+39 }
 ```
+
+参数NPC表示每个时钟处理的像素个数（Number of pixels per clock），在代码中设置为XF_NPPC1，表示每个时钟处理一个像素。
+
+代码的19至22行的编译指令用于指示xf::Mat格式变量中的**data成员**使用**流（stream）数据来通信**，**即采用FIFO**来实现，而**不是默认的RAM**。后面的选项**dim=1**表示用于转换成FIFO的数组是一维的，**depth=1**表示**FIFO的深度为1**。在应用**dataflow**优化时，**多个函数之间**以**流水线的形式**处理**图像数据流**，因为每个时钟只处理一个像素，因此FIFO的深度没有必要太大，设置成1可以减少FPGA存储资源的消耗。
+
+以上参考自[基于xfOpenCV的中值滤波实验](https://www.amobbs.com/thread-5740463-1-1.html)
+
+
+# 基础
 
 ## VDMA
 
@@ -657,119 +700,312 @@ inline void swap1(int *a, int *b){
 
 类模板可定义一系列相关性，这些类基于在实例化时传递到类的类型参数，函数模板定义的是一系列函数，利用函数模板，你可以指定基于相同代码但作用于不同类型或类的函数集。
 
-## Some Words
 
-Accumulate   积累，累积
-accumulator  累加器
-attribute   属性
+# How to Use Vitis Vision Library
 
-bitwise      按位
+自从Xilinx推出Vivado HLS以来，越来越多的工程师，尤其是软件工程师开始转向FPGA设计与开发这一领域。其中一个主要原因是通常这些软件工程师都具有较为深厚的C/C++功底，这给他们的开发带来了一定的优势，但毕竟最终在FPGA上运行的是实实在在的电路，需要获得更高的性能就要对**工具使用方法、器件结构、面向HLS的C/C++代码风格、各种pragma（Directive）、各种优化流程与优化方法**都要有所了解。为此，Xilinx在推出这个工具的同时，也发布了相应的教程和用户指南。
 
-constructor  构造器（构造函数）
-coordinate   坐标 
-convolve/convolution     卷积
-criteria     标准  
-compatible   兼容的
-constitute   构成
+**ug871**
 
+ug871可以说是入门级首选教程。该教程讲解详细，案例丰富，非常适合初学者。该教程共11章，22个实验，可以帮助工程师理解HLS基本概念，掌握Vivado HLS工具设计流程、接口综合、任意精度数据类型、设计分析方法、设计优化方法、设计验证方法以及在IPI和System Generator中如何使用HLS的综合结果。
 
+**ug902**
 
-digilent     勤快的
-deviation    偏差  
-depict       描绘
+相比于只有257页的ug871，ug902多达589页，是前者的两倍还要多。因此，一页一页地翻看效率会很低。一种可行的方法是把它当作HLS的字典，在ug871中看到不明白的或者讲解不够深入的内容可以到ug902中去查阅，这样有的放矢，可以事半功倍。
+有关HLS Video的介绍可以参考UG902。需要注意的是，只有在v2018.2及之前版本的UG902文档中，才对HLS视频库作了详细介绍。
+之后的版本开始使用xfOpenCV库（**Xilinx xfOpenCV Library** : htps://github.com/Xilinx/xfopencv），到现在使用最新的Vitis Vision库。
 
+**ug1270**
 
+ug1270系统、全面地介绍了VivadoHLS的优化方法，属于高级教程，适合于已经掌握了HLS设计方法和基本的优化方法的工程师。ug1270阐述了HLS的优化方法流程，详细介绍了各种pragmas的含义，对于进一步提升工程师的HLS技能非常有帮助。
 
-extract      提取
-enumerate    枚举
+**ug1233**
+
+如果想在Vivado HLS下使用OpenCV，可以查看ug1233。该文档对**HLS所支持的OpenCV函数**有具体说明。
 
 
-facilitate   促进
+**GitHub上的资源**
+
+此外，在GitHub上，Xilinx也提供了丰富的案例。
+
+HLS基本案例：
+https://github.com/Xilinx/HLx_Examples
+
+OpenCV案例：
+https://github.com/Xilinx/xfopencv
+
+**VivadoHLS自带案例**
+打开Vivado HLS，在其Welcome Page上，点击Open ExampleProject，会弹出如下界面。可以看到Example Project既包含**设计案例**也包括**代码风格相关的案例**，对于快速理解**面向HLS的C/C++代码风格**大有裨益。
+![](hlsNote/39.png)
+
+以上参考自[Vivado HLS学习资料有哪些](https://cloud.tencent.com/developer/article/1628623?from=article.detail.1652648&areaSource=106000.1&traceId=hn2Vvwr3M64KxJjVRcew3)
 
 
-intensity    亮度/灰阶值
-infrastructure  基础架构
-iterative    迭代的
-
-
-
-luminence    亮度
-
-
-
-manipulate   操纵
-
-
-
-
-optimized    优化的
-optical      光学的
-
-
-
-
-parallelism  并行性
-ported       移植
-pyramidal    金字塔形的
-
-quantized    量化
-
-
-rectangle    矩形
-
-
-
-
-
-scalar       标量
-spatial      空间的 
-suppression  抑制
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## How to Use Vitis Vision Library
-
-### 准备工作
+## 准备工作
 
 在Windows的vitis补全只需要按下`alt + / `头文件和变量名都能补全出来
 
-**CFLAGS**
+### CFLAGS
 -IC:\Xilinx\Vitis_Libraries\Vitis_Libraries-main\vision\L1\include -std=c++0x -II:\Professional\opencv_lib\opencv\Latest4Vitis\install\include
+synthesis不要-std=c++0x及之后的语句
 
-**Linker Flags**
+### Linker Flags
 -LI:\Professional\opencv_lib\opencv\Latest4Vitis\install\x64\mingw\lib -llibopencv_core470 -llibopencv_imgcodecs470 -llibopencv_imgproc470
 需要什么库自己链接就可以了
 
-### 如何编程
+## Vitis Vision Library API Reference
+
+### xf::cv::Mat Image Container Class
+
+**xf::cv::Mat** is a template class that serves as a **container for storing image data and its attributes**.
+
+**Class Definition:**
+```c++
+template <int T, int ROWS, int COLS, int NPC, int XFCVDEPTH = _XFCVDEPTH_DEFAULT>
+class Mat {
+   public:
+   unsigned char allocatedFlag; // flag to mark memory allocation in this class
+   int rows, cols, size;        // actual image size
+
+   typedef XF_TNAME(T, NPC) DATATYPE;
+   using _DATATTYPE = typename std::conditional<
+      (XFCVDEPTH < 0),
+      DATATYPE*,                 // Case of Memory Mapped pointer
+      typename std::conditional< // Case of Stream
+         (XFCVDEPTH == 0),
+         hls::stream<DATATYPE>,           // Case of default Dtream depth or user can override outside
+         hls::stream<DATATYPE, XFCVDEPTH> // Case of Stream depth specified
+         >::type>::type;
+   _DATATTYPE data;
+
+   Mat(); // default constructor
+   Mat(Size _sz);
+   Mat(int _rows, int _cols);
+   Mat(int _size, int _rows, int _cols);
+   Mat(int _rows, int _cols, void* _data);
+   Mat(const Mat&); // copy constructor
+
+   ~Mat();
+
+   Mat& operator=(const Mat&); // Assignment operator
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   void alloc_data() {
+#ifndef __SYNTHESIS__
+      data = (DATATYPE*)malloc(size * sizeof(DATATYPE));
+
+      if (data == NULL) {
+         fprintf(stderr, "\nFailed to allocate memory\n");
+      } else {
+         allocatedFlag = 1;
+      }
+#endif
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   void alloc_data() {
+      // This is a stream
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   void free_data() {
+      if (data != NULL) {
+#ifndef __SYNTHESIS__
+         free(data);
+#endif
+      }
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   void free_data() {}
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   void copyData(const Mat& src) {
+      for (int i = 0; i < (rows * ((cols + NPC - 1) >> XF_BITSHIFT(NPC))); ++i) {
+         data[i] = src.data[i];
+      }
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   void copyData(const Mat& src) {
+      // This is a stream
+      assert(0);
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   void assignDataPtr(void* _data) {
+      data = (DATATYPE*)_data;
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   void assignDataPtr(void* _data) {
+      // This is a stream
+      assert(0);
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   XF_TNAME(T, NPC)
+   read(int index) {
+      return data[index];
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   XF_TNAME(T, NPC)
+   read(int index) {
+      return data.read();
+   }
+   float read_float(int index);
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   void write(int index, XF_TNAME(T, NPC) val) {
+      data[index] = val;
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   void write(int index, XF_TNAME(T, NPC) val) {
+      data.write(val);
+   }
+   void write_float(int index, float val);
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D >= 0)>::type* = nullptr>
+   void init(int _rows, int _cols, void* _data) {
+      init(_rows, _cols);
+      copyTo(_data);
+   }
+
+   template <int D = XFCVDEPTH, typename std::enable_if<(D < 0)>::type* = nullptr>
+   void init(int _rows, int _cols, void* _data) {
+      init(_rows, _cols, false);
+      assignDataPtr(_data);
+   }
+
+   void init(int _rows, int _cols, bool allocate = true);
+   void copyTo(void* fromData);
+   unsigned char* copyFrom();
+
+   const int type() const;
+   const int depth() const;
+   const int channels() const;
+
+   template <int DST_T>
+   void convertTo(Mat<DST_T, ROWS, COLS, NPC, XFCVDEPTH>& dst, int otype, double alpha = 1, double beta = 0);
+};
+```
+
+#### Class definition
+
+>**Parameter Descriptions:**
+>
+>![](hlsNote/35.png)
+>**size**参数比较重要，描述Mat类data成员中存储的**word**数，这个数使用`rows*cols/(number of pixels packed per word)`来计算，**分母就是NPC**。Mat的data成员是一维数组，其中每个数据元素应该就是word。word应该就是pixel按NPC打包成的，一个clock传输一个word相当于传输了number of pixels。
+**data** 是指向`the words that store the pixels of the image`的指针，也可以理解为data数组的数组名，指向了这个数组第一个元素。
+
+>**member functions and their descriptions:**
+>
+>![](hlsNote/36.png)
+
+>**template parameters:**
+>
+>![](hlsNote/37.png)
+>**TYPE**：Type of the pixel data. For example, XF_8UC1 八位无符号单通道像素。
+**NPC**：**The number of pixels to be packed per word**. For instance, XF_NPPC1 for 1 pixel per word; and XF_NPPC8 for 8 pixels per word.
+**XFCVDEPTH**：**Depth of the hls::stream in the xf::cv::Mat**不懂。应该和Mat中定义的数据类型_DATATYPE有关。
+
+
+##### Note
+
+>![](hlsNote/40.png)
+>所谓图像深度指的是定义在 xf::cv::Mat 中的 hls::stream 的深度，也就是XFCVDEPTH。
+
+
+#### Parallelism
+
+对一个函数指定并行处理的像素数
+
+可选参数如下：
+![](hlsNote/41.png)
+
+定义Parallelism会用到的两个宏：
+![](hlsNote/42.png)
+第二个宏XF_BITSHIFT的目的是解析出图像大小需要右移的次数以便得到传输次数，比如XF_NPPC8，一次传输八个像素，那传输次数便是总像素数/8，也就是总像素数>>8。
+
+
+#### Data Types
+
+像素数据类型是由像素数据深度和像素通道数结合而来的，通用命名法为：
+`XF_<Number of bits per pixel><signed (S) or unsigned (U) or float (F)>C<number of channels>`
+![](hlsNote/43.png)
+
+
+##### Manipulating Data Type
+
+基于 number of pixels to process per clock cycle 和 Data Types of Pixel，视觉库使用了一些数据类型用于xf::cv::Mat以及内部数据处理，举例如下：
+![](hlsNote/44.png)
+
+For more information, see the Vitis HLS User Guide: High-Level Synthesis (UG1399 ).
+
+
+###### Note
+
+ap_uint<>, ap_int<>, ap_fixed<>, and ap_ufixed<> types belong to the high-level synthesis (HLS) library.
+
+
+#### Class Function
+
+- xf::cv::imread  从文件读图
+- xf::cv::imwrite  将图像写入文件中
+- xf::cv::absDiff
+- xf::cv::convertTo
+详见[Class function](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/api-reference.html_1_3)
+
+
+
+### Vitis Vision Library Functions
+
+The Vitis Vision library is a set of **select OpenCV functions** optimized for Zynq-7000, Zynq UltraScale+ MPSoC, Versal VCK190, Alveo U200 and U50 devices. 
+
+#### Note
+>All the functions in the library are implemented in streaming model except 7. Bounding box, Canny, Cornertracker, Crop, EdgeTracing, MeanShiftTracking, Rotate are memory mapped implemenations. These functions need to have the flag __SDA_MEM_MAP__ set for compiling correctly
+>除了这七个函数使用内存映射实现的，其他的都是流模型实现的，使用这七个函数时要设置对应的flag。
+>
+>Default depth value for all the memory mapped implemenations(Bounding box, Canny, Cornertracker, Crop, EdgeTracing, MeanShiftTracking, Rotate) is “_XFCVDEPTH_DEFAULT = -1”. Default depth value for all the streaming model implemenations is “_XFCVDEPTH_DEFAULT = 2”.
+>对于内存映射实现的默认深度值_XFCVDEPTH_DEFAULT = -1，对于流模型实现的默认深度值_XFCVDEPTH_DEFAULT = -2，这个在编程中要用到的。
+>
+>Number of pixel per clock depends on the maximum bus width a device can support. For example: Zynq-7000 SoC has 64-bit interface and so for a pixel type 16UC1, maximum of four pixel per clock (XF_NPPC4) is possible.
+>每个时钟周期处理的像素数NPC。
+
+具体函数介绍见[Vitis Vision Library Functions](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/api-reference.html_2_0)
+
+
+## Getting Started with HLS
+
+### AXI Video Interface Functions
 
 > 基本特征
 ![](hlsNote/26.png)
+
 ---
+
 >看 Vitis Vision Library 文件夹包含的内容，table是重点
 [Vitis Vision Library Contents](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_0_2)
 ![](hlsNote/27.png)
+
 ---
+
 >看包含库函数的后文件及其对应的文件夹名，table是重点
 [Using the Vitis vision Library](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_1_3)
 ![](hlsNote/28.png)
 文件夹common和core包含库函数所需要的基础设施，包括`basic functions, Mat class, and macros`，库函数按类分成四个文件夹：`features, video, dnn, and imgproc `，为了使用这些库函数，必须在VitisProject中添加文件夹的路径，之后便可以include相关的头文件，应该是要添加文件夹的路径到CFlags。
 比如，在添加上文的CFlags之后，在源文件中用这样的语句便可以添加头文件：
 ![](hlsNote/29.png)
+
 ---
+
 >[AXI Video Interface Functions](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_2_0)
 ![](hlsNote/30.png)
----
+
+### Migrating HLS Video Library to Vitis vision
+
 >[Migrating HLS Video Library to Vitis vision]()
 HLS video视频库已经被弃用，其中所有函数和大部分的基础结构都能够在Vitis vision库中找到，但是有一些变化。
 >1. 命名空间由hls::变为xf::cv::，hls::Mat使用hls::stream存储数据但是xf::cv::Mat使用指针，所以前者无法被后者完全代替。
@@ -779,7 +1015,9 @@ HLS video视频库已经被弃用，其中所有函数和大部分的基础结�
 >4. convert Mat format data to/from AXI4-Stream compatible data type 的函数原来是 hls::AXIvideo2Mat and hls::Mat2AXIvideo，已经被xf::cv::AXIvideo2xfMat and xf::cv:: xfMat2AXIvideo 替换，定义在**xf_infra.hpp**。
 >5. **要使用以上这些函数，必须包含这些头文件。**
 ![](hlsNote/32.png)
+
 ---
+
 >**xf::cv::window**
 一个代表二维窗口缓存的模板类，使用三个参数去定义行数，列数和像素数据类型。
 类定义如下：
@@ -864,7 +1102,8 @@ Sample code for line buffer declaration:
 这个table总结了从HLS Video库移植到Vitis Vision库中的视频处理函数。
 
 
-## 基于PYNQ软硬结合的二维手势交互设计
+
+# 基于PYNQ软硬结合的二维手势交互设计
 
 ![](hlsNote/14.png)
 
@@ -901,21 +1140,79 @@ Sample code for line buffer declaration:
 ![](hlsNote/25.png)
 
 
+# Some Words
+
+Accumulate   积累，累积
+accumulator  累加器
+attribute   属性
+
+bitwise      按位
+
+constructor  构造器（构造函数）
+coordinate   坐标 
+convolve/convolution     卷积
+criteria     标准  
+compatible   兼容的
+constitute   构成
+
+
+
+digilent     勤快的
+deviation    偏差  
+depict       描绘
+
+
+
+extract      提取
+enumerate    枚举
+
+
+facilitate   促进
+
+
+intensity    亮度/灰阶值
+infrastructure  基础架构
+iterative    迭代的
+
+
+
+luminence    亮度
+
+
+
+manipulate   操纵
 
 
 
 
+optimized    优化的
+optical      光学的
 
 
 
 
+parallelism  并行性
+ported       移植
+pyramidal    金字塔形的
+
+quantized    量化
+
+
+rectangle    矩形
+Retrieve     取回
+register     寄存器，登记
+
+
+
+scalar       标量
+spatial      空间的 
+suppression  抑制
 
 
 
 
+# Some Problems
 
-
-## HLS综合时遇到的bug
 [在 VHLS 中导出 RTL 时出现问题](https://github.com/dgschwend/zynqnet/issues/30)
 [HLS BUG](https://blog.csdn.net/Chitanda_Eru_/article/details/122287842?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-122287842-blog-122312505.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-122287842-blog-122312505.pc_relevant_default&utm_relevant_index=1)
 [HLS ERROR: [IMPL 213-28] Failed to generate IP.](https://blog.csdn.net/u014798590/article/details/122312505)
@@ -926,7 +1223,11 @@ Sample code for line buffer declaration:
 参考[补丁](https://support.xilinx.com/s/article/76960?language=en_US)
 
 
-## 参考文章
+
+# 参考资料
+
+[pynq-z2资料下载](http://e-elements.com/product/show/id/60.shtml)
+[TUL pynq-z2](https://www.tulembedded.com/FPGA/ProductsPYNQ-Z2.html)
 
 
 [使用 HLS 进行基于 FPGA 的边缘检测](https://www.hackster.io/adam-taylor/fpga-based-edge-detection-using-hls-192ad2)
