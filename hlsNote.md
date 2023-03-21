@@ -728,17 +728,48 @@ ug1270系统、全面地介绍了VivadoHLS的优化方法，属于高级教程�
 
 此外，在GitHub上，Xilinx也提供了丰富的案例。
 
-HLS基本案例：
-https://github.com/Xilinx/HLx_Examples
-
 OpenCV案例：
 https://github.com/Xilinx/xfopencv
 
-**VivadoHLS自带案例**
+
+**Vivado HLS自带案例**
 打开Vivado HLS，在其Welcome Page上，点击Open ExampleProject，会弹出如下界面。可以看到Example Project既包含**设计案例**也包括**代码风格相关的案例**，对于快速理解**面向HLS的C/C++代码风格**大有裨益。
 ![](hlsNote/39.png)
 
 以上参考自[Vivado HLS学习资料有哪些](https://cloud.tencent.com/developer/article/1628623?from=article.detail.1652648&areaSource=106000.1&traceId=hn2Vvwr3M64KxJjVRcew3)
+
+
+**Vitis HLS自带案例**
+https://github.com/Xilinx/Vitis-HLS-Introductory-Examples
+
+这些例程被分成了以下几类：
+![](hlsNote/45.png)
+
+我将例程下载在`C:\Users\Admin\.Xilinx\vitis_hls\2022.2`。
+
+
+**Vitis Vision Lib例程**
+https://github.com/Xilinx/Vitis_Libraries/tree/master/vision
+![](hlsNote/47.png)
+看看L1文件夹的介绍：
+![](hlsNote/48.png)
+
+运行这些例程可以通过vitis_hls_cmd或者GUI界面来完成：
+![](hlsNote/46.png)
+注意：需要使用vitis_hls_cmd执行该命令后生成.prj文件夹才能在Vitis HLS GUI中打开。
+
+vitis_hls_cmd的位置应该在：
+`C:\Users\Admin\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Xilinx Design Tools\Vitis_HLS 2022.2\Vitis HLS 2022.2 Command Prompt`也即
+`C:\Xilinx\Vitis_HLS\2022.2\bin\vitis_hls_cmd.bat`。
+
+运行C simulation产生csim.exe可执行文件，在目录solution1/csim/build放入要作为TB输入的图片，在此处打开终端，执行命令`./csim.exe ./param1.jpg ./param2.jpg`即可将param1.jpg和param2.jpg作为TB的输入来产生仿真结果。
+
+**关于TB中main函数(int argc, char \*argv[])的理解**：
+这两个参数实际上都是对于 **你在终端执行的命令** 的描述，要知道csim.exe就是TB编译链接后产生的可执行文件，而前文提到的命令能将两张图片传递给main函数，而如何传递呢，你输入的只是字符串呀。就靠argc和argv两个参数了，argc指示程序启动时命令行参数的个数，argv则包含具体的参数字符串，也就是用argv这个字符串数组把命令行参数存起来。注意：命令行参数要空格分隔，也就是输入`./csim.exe ./param1.jpg ./param2.jpg`这条命令时，argc=3，argv[0]=./csim.exe, argv[1]=./param1.jpg, argv[2]=./param2.jpg。通过这两个参数，程序便可以获知自身启动时的命令信息。
+**参考**：
+https://blog.csdn.net/fenhong91/article/details/54863718
+https://blog.51cto.com/u_15338641/3630248
+
 
 
 ## 准备工作
@@ -747,10 +778,10 @@ https://github.com/Xilinx/xfopencv
 
 ### CFLAGS
 -IC:\Xilinx\Vitis_Libraries\Vitis_Libraries-main\vision\L1\include -std=c++0x -II:\Professional\opencv_lib\opencv\Latest4Vitis\install\include
-synthesis不要-std=c++0x及之后的语句
+**synthesis不要-std=c++0x及之后的语句**
 
 ### Linker Flags
--LI:\Professional\opencv_lib\opencv\Latest4Vitis\install\x64\mingw\lib -llibopencv_core470 -llibopencv_imgcodecs470 -llibopencv_imgproc470
+-LI:\Professional\opencv_lib\opencv\Latest4Vitis\install\x64\mingw\lib -llibopencv_core470 -llibopencv_imgcodecs470 -llibopencv_imgproc470 -llibopencv_highgui470
 需要什么库自己链接就可以了
 
 ## Vitis Vision Library API Reference
