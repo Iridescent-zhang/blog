@@ -233,6 +233,23 @@ void foo_top() {
 #### 用于 C++ 的任意精度定点数据类型
 使用定点数据类型执行的C++语言 仿真的行为与综合创建的硬件的行为 相匹配，从而能够使用C语言层次快速仿真来分析位精度、量化和上溢的影响，在Vitis HLS中使用定点数据非常重要。
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Vitis 使用
 
 Vitis 软件平台支持嵌入式软件开发流程作为SDK的新一代技术，也支持Vitis应用加速开发流程，以满足使用基于Xilinx FPGA的最新软件加速功能的需求。
@@ -336,7 +353,10 @@ from pynq import GPIO
 先结束了，暂时用不上python了，电脑串口连接不上 pynq-2 是线的原因。
 
 # 实战
-使用 PYNQ-Z2 ，创建HLS工程时应该选择器件（part）
+
+Board_File中的PYNQ-Z2文件夹复制到Vitis安装目录下Vivado\2022.2\data\boards\board_files后可以在创建工程时直接选择板子，为Vitis和Vitis HLS添加board_files也按这个步骤来。在创建block design时创建ZYNQ IP核后，运行Run Block Automation时应该勾选Apply Board Preset，这样我们前面复制的board file会自动将ddr,时钟等基本配置给设置好,就不用一个一个要我们去设置了。
+
+![](hlsNote/121.png)
 
 ![](https://i.postimg.cc/hvDbQZ1B/9.jpg)
 
@@ -467,6 +487,41 @@ OV5640 SCCB写传输协议：
 
 ID ADDRESS 由七位器件地址和一位读写控制位构成（0：写，1：读），七位在前，所以读写时需要发送不同的ID ADDRESS。
 
+![](hlsNote/88.png)
+
+### ISP 图像信号处理
+
+**ISP输入窗口设置（ISP Input Size）** 允许用户设置整个传感器显示区域（physical pixel size，2632\*1951，其中2592\*1944像素是有效的），开窗范围从0\*0~2632\*1951都可以任意设置，也就是上图中的**X_ADDR_ST**（寄存器地址0x3800、0x3801）、**Y_ADDR_ST**（寄存器地址0x3802、0x3803）、**X_ADDR_END**（寄存器地址0x3804、0x3805）和**Y_ADDR_END**（寄存器地址0x3806、0x3807）寄存器。该窗口设置范围中的像素数据将进入ISP进行图像处理。
+**预缩放窗口设置（pre-scaling size）** 允许用户在ISP输入窗口的基础上进行裁剪，用于设置将进行缩放的窗口大小，该设置**仅在ISP输入窗口内进行X/Y方向的偏移**。可以通过**X_OFFSET**（寄存器地址0x3810、0x3811）和**Y_OFFSET**（寄存器地址0x3812、0x3813）进行配置。
+**输出大小窗口设置（data output size）** 是在**预缩放窗口**的基础上，经过内部DSP进行缩放处理，并将处理后的数据输出给外部的图像窗口，**图像窗口控制着最终的图像输出尺寸**。可以通过**X_OUTPUT_SIZE**（寄存器地址0x3808、0x3809）和**Y_OUTPUT_SIZE**（寄存器地址0x380A、0x380B）进行配置。注意：当**输出大小窗口与预缩放窗口比例**不一致时，图像将进行缩放处理（图像变形），仅当两者比例一致时，输出比例才是1:1（正常图像）。
+
+**总结就是：**
+ISP输入窗口范围由\[Y_ADDR_ST : Y_ADDR_END][X_ADDR_ST : X_ADDR_END]确定；预缩放窗口在ISP基础上进行X/Y方向的偏移，偏移大小由X_OFFSET和Y_OFFSET确定；输出大小窗口同时也是OV5640输出给外部的图像尺寸，也就是显示在显示器上的图像大小，输出大小窗口由\[X_OUTPUT_SIZE][Y_OUTPUT_SIZE]直接确定；需要注意的是，输出大小窗口由预缩放窗口缩放而来，如果二者不成比例，那么显示器上看到的图像将会变形。
+
+```c++
+sccb_write_reg16(0x380c, total_h_pixel >> 8    );  //水平总像素大小高5位
+sccb_write_reg16(0x380d, total_h_pixel & 0x00FF);  //水平总像素大小低8位
+sccb_write_reg16(0x380e, total_v_pixel >> 8    );  //垂直总像素大小高5位
+sccb_write_reg16(0x380f, total_v_pixel & 0x00FF);  //垂直总像素大小低8位
+
+//X_OUTPUT_SIZE
+sccb_write_reg16(0x3808, cmos_h_pixel >> 8     );  //DVP 输出水平像素点数高4位
+sccb_write_reg16(0x3809, cmos_h_pixel & 0x00FF );  //DVP 输出水平像素点数低8位
+
+//Y_OUTPUT_SIZE
+sccb_write_reg16(0x380a, cmos_v_pixel >> 8     );  //DVP 输出垂直像素点数高3位
+sccb_write_reg16(0x380b, cmos_v_pixel & 0x00FF );  //DVP 输出垂直像素点数低8位
+
+```
+![](hlsNote/88.png)
+
+![](hlsNote/89.png)
+
+![](hlsNote/90.png)
+
+![](hlsNote/91.png)
+
+我配置的摄像头只能显示一半，对于我左手边的部分在显示屏上不能显示，正对摄像头时人像显示在显示器的边缘。
 
 
 
@@ -509,11 +564,7 @@ YUV4:4:4格式和 YUV4:2:2格式的**数据流**也是不同的。 数据流也�
 可得椭圆的表达式如下：
 ![](hlsNote/5.png)
 通过此椭圆表达式即建立了一个检测肤色的椭圆模型，通过颜色空间变换后的Cb,Cr值求出x,y坐标，通过判断坐标是否位于椭圆区域之内来判断其是否属于肤色。上式左边<=1则为肤色，反之不属于肤色。此时可二值化。
-> - **肤色检测**
-以一幅复杂肤色图为例：
-![](hlsNote/2.png)
-![](hlsNote/6.png)
-通过对比发现，由于肤色中B分量较少，所以在YCgCr空间中的肤色检测效果更好，肤色散点更少，前景衣服上大部分类肤颜色并没有吴坚，在一定程度上证明了模型建立的有效性。
+
 
 ### 论文（实时 FPGA 手势识别 算法的设计）
 
@@ -1015,13 +1066,13 @@ The Vitis Vision library is a set of **select OpenCV functions** optimized for Z
 > 基本特征
 ![](hlsNote/26.png)
 
----
+
 
 >看 Vitis Vision Library 文件夹包含的内容，table是重点
 [Vitis Vision Library Contents](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_0_2)
 ![](hlsNote/27.png)
 
----
+
 
 >看包含库函数的后文件及其对应的文件夹名，table是重点
 [Using the Vitis vision Library](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_1_3)
@@ -1030,7 +1081,7 @@ The Vitis Vision library is a set of **select OpenCV functions** optimized for Z
 比如，在添加上文的CFlags之后，在源文件中用这样的语句便可以添加头文件：
 ![](hlsNote/29.png)
 
----
+
 
 >[AXI Video Interface Functions](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_2_0)
 ![](hlsNote/30.png)
@@ -1047,7 +1098,7 @@ HLS video视频库已经被弃用，其中所有函数和大部分的基础结�
 >5. **要使用以上这些函数，必须包含这些头文件。**
 ![](hlsNote/32.png)
 
----
+
 
 >**xf::cv::window**
 一个代表二维窗口缓存的模板类，使用三个参数去定义行数，列数和像素数据类型。
@@ -1086,10 +1137,10 @@ Sample code for window buffer declaration
 >Window<K_ROWS, K_COLS, unsigned char> kernel;
 >```
 
----
+
 
 >**xf::cv::LineBuffer**
-一个代表二维线缓存的模板类，用三个参数指定windows buffer中的行数，列数和像素数据类型。
+一个代表二维线缓存的模板类，用三个参数指定line buffer中的行数，列数和像素数据类型。
 定义如下：
 ```c++
 template<int ROWS, int COLS, typename T, XF_ramtype_e MEM_TYPE=RAM_S2P_BRAM, int RESHAPE_FACTOR=1>
@@ -1127,10 +1178,213 @@ Sample code for line buffer declaration:
 >LineBuffer<3, 1920, XF_8UC3, RAM_S2P_URAM,1>     buff;
 >```
 
----
 
 >[Video Processing Functions](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_2_1_5)
 这个table总结了从HLS Video库移植到Vitis Vision库中的视频处理函数。
+
+
+## 优化指令
+
+\#pragma HLS RESOURCE variable=input_stream core=AXIS metadata="-bus_bundle INPUT_STREAM"
+\#pragma HLS RESOURCE variable=output_stream core=AXIS metadata="-bus_bundle OUTPUT_STREAM"
+\#pragma HLS INTERFACE ap_ctrl_none port=return
+
+
+void VID_PROC(AXI_STREAM &video_in, AXI_STREAM &video_out, int rows, int cols)
+\#pragma HLS INTERFACE axis port=video_in bundle=INPUT_STREAM
+\#pragma HLS INTERFACE axis port=video_out bundle=OUTPUT_STREAM
+\#pragma HLS INTERFACE s_axilite port=rows bundle=CONTROL_BUS offset=0x14
+\#pragma HLS INTERFACE s_axilite port=cols bundle=CONTROL_BUS offset=0x1c
+\#pragma HLS INTERFACE s_axilite port=return bundle=CONTROL_BUS
+\#pragma HLS dataflow
+\#pragma HLS stream depth=20000 variable=OUT2.data_stream
+
+void accumulate_accel(ap_uint<INPUT_PTR_WIDTH>* img_in1,
+                      ap_uint<INPUT_PTR_WIDTH>* img_in2,
+                      ap_uint<OUTPUT_PTR_WIDTH>* img_out,
+                      int height,
+                      int width) 
+\#pragma HLS INTERFACE m_axi port=img_in1 offset=slave bundle=gmem0 depth=__XF_DEPTH
+\#pragma HLS INTERFACE m_axi port=img_in2 offset=slave bundle=gmem1 depth=__XF_DEPTH
+\#pragma HLS INTERFACE m_axi port=img_out offset=slave bundle=gmem2 depth=__XF_DEPTH
+\#pragma HLS INTERFACE s_axilite port=return bundle=control
+
+\#pragma HLS INTERFACE axis port=video_in bundle=INPUT_STREAM
+\#pragma HLS INTERFACE axis port=video_out bundle=OUTPUT_STREAM
+\#pragma HLS INTERFACE s_axilite port=return bundle=CONTROL_BUS
+\#pragma HLS INTERFACE s_axilite port=rows bundle=CONTROL_BUS offset=0x14
+\#pragma HLS INTERFACE s_axilite port=cols bundle=CONTROL_BUS offset=0x1C
+
+
+
+
+## 看博客
+
+[接口，优化指令]https://blog.csdn.net/xzs520xzs/article/details/126673128
+
+在vivado HLS软件右侧中有个Directive栏（如果没有可以在功能栏中的window将其显示出来），里边列出了所有的**变量、函数、循环**结构，右键点击就可以对其进行配置；简单讲解一下如何进行配置，对于循环结构体，一般选择**unroll**（展开循环），可以自己设定展开的因子factor；对于函数，为了提高程序的并行处理能力，可以右键选择**PIPELINE**；对于数组，可以设置为**ARRAY_PARTITION**，数组维数根据需求设置。每一个优化的方案都可以保存在一个solution中，可以创建多个solution。
+
+
+[HLS：接口完整学习与综合测试](https://blog.csdn.net/mmphhh/article/details/115655208)
+
+
+[HLS第三十五课（XAPP1167，基于videolib实现图像处理）](https://blog.csdn.net/weixin_42418557/article/details/121130337?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_utm_term~default-0-121130337-blog-75909681.pc_relevant_multi_platform_whitelistv6&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+
+```c++
+typedef hls::Mat<MAX_HEIGHT, MAX_WIDTH, HLS_8UC2>     IMAGE_C2;
+
+void image_filter(AXI_STREAM& video_in, AXI_STREAM& video_out, int rows, int cols) {
+    //Create AXI streaming interfaces for the core
+#pragma HLS INTERFACE axis port=video_in bundle=INPUT_STREAM
+#pragma HLS INTERFACE axis port=video_out bundle=OUTPUT_STREAM
+
+#pragma HLS INTERFACE s_axilite port=return bundle=CONTROL_BUS
+#pragma HLS INTERFACE s_axilite port=rows bundle=CONTROL_BUS offset=0x14
+#pragma HLS INTERFACE s_axilite port=cols bundle=CONTROL_BUS offset=0x1C
+
+#pragma HLS INTERFACE ap_stable port=rows
+#pragma HLS INTERFACE ap_stable port=cols
+
+    IMAGE_C2 img_0(rows, cols);
+    IMAGE_C2 img_1_0(rows, cols);
+    IMAGE_C2 img_1_1(rows, cols);
+    IMAGE_C1 img_1_Y(rows, cols);
+    IMAGE_C1 img_1_UV(rows, cols);
+    IMAGE_C2 img_2(rows, cols);
+    IMAGE_C1 mask(rows, cols);
+    IMAGE_C1 dmask(rows, cols);
+    PIXEL_C2 color(255,0);
+    
+#pragma HLS dataflow
+
+#pragma HLS stream depth=20000 variable=img_1_1.data_stream
+    hls::AXIvideo2Mat(video_in, img_0);
+    hls::Duplicate(img_0, img_1_0, img_1_1);
+    hls::Split(img_1_0, img_1_Y, img_1_UV);
+    hls::Consume(img_1_UV);
+    hls::FASTX(img_1_Y, mask, 20, true);
+    hls::Dilate(mask, dmask);
+    hls::PaintMask(img_1_1, dmask, img_2, color);
+    hls::Mat2AXIvideo(img_2, video_out);
+}
+```
+
+这里重点是img_1_1的使用问题。
+在整体**dataflow**的情况下，**HLS对上下游任务的数据交接**，使用**FIFO**方式。
+但是复制后的img_1_0和img_1_1，它们的消费速度是不同步的。
+在数据路径上，img_1_0很快就被下游的任务split消费掉了。但是img_1_1却要等到更下游的paintmask处才能被消费掉。
+这段时间内，duplicate仍然在不断的生产数据，同时提供给img_1_0和img_1_1。（流数据是这样的）
+所以，**img_1_1需要具备足够大的FIFO depth**。
+`#pragma HLS stream depth=20000 variable=img_1_1.data_stream`
+这条约束，指定了**Mat对象的内部存储数组（data_stream）**，显式地被HLS理解为**FIFO（stream）**，并且深度为**20000**。
+
+
+
+
+
+## 图像处理中的数据类型
+
+xf::cv::Mat中存储像素数据的是成员是data，data定义如下：
+
+![](hlsNote/87.png)
+
+这里的T是像素数据类型，如XF_8UC3，DATATYPE是XF_TNAME(T, NPC)的别名，从前面的Manipulating Data Type章节了解到XF_TNAME(T, NPC)会解析成ap_uint<像素宽度*通道数*NPC>，如XF_TNAME(XF_8UC3, XF_NPPC1)解析成ap_uint<8*3*1>=ap_uint<24>，因此我们可以推导出DATATYPE的类型。
+接着看到_DATATYPE的定义，虽然定义复杂但我们可以逐层推断，conditional相比是条件判断，程序中使用流模型所以XFCVDEPTH为默认值也就是2，进入第二层条件判断可以发现_DATATYPE被定义成了hls::stream<DATATYPE, XFCVDEPTH>::type::type，重点关注hls::stream<DATATYPE, XFCVDEPTH>。所以data也是一种流数据模型。
+
+
+
+## 看课
+
+[learn from here](https://www.bilibili.com/video/BV1bt41187RW/?p=1&vd_source=7b41839c0bc8f13071f01977ba9e14de)
+
+throghput 吞吐率
+注意数据位宽，原则是大数据不能溢出，小数据不能损失，尤其用定点数的时候。
+HLS是不支持递归的
+
+![](hlsNote/114.png)
+![](hlsNote/115.png)
+![](hlsNote/116.png)
+![](hlsNote/117.png)
+![](hlsNote/118.png)
+![](hlsNote/119.png)
+![](hlsNote/120.png) 
+![](hlsNote/93.png)
+![](hlsNote/94.png)
+![](hlsNote/95.png)
+![](hlsNote/96.png)
+![](hlsNote/97.png)
+![](hlsNote/98.png)
+![](hlsNote/99.png)
+![](hlsNote/100.png)
+![](hlsNote/101.png)
+![](hlsNote/102.png)
+![](hlsNote/103.png)
+![](hlsNote/104.png)
+![](hlsNote/105.png)
+![](hlsNote/106.png)
+![](hlsNote/107.png)
+![](hlsNote/108.png)
+![](hlsNote/109.png)
+![](hlsNote/110.png)
+![](hlsNote/111.png)
+![](hlsNote/112.png) 
+![](hlsNote/113.png)
+
+![](hlsNote/122.png) 
+![](hlsNote/123.png) 
+![](hlsNote/124.png) 
+![](hlsNote/125.png) 
+![](hlsNote/126.png) 
+![](hlsNote/127.png) 
+![](hlsNote/128.png) 
+![](hlsNote/129.png) 
+![](hlsNote/130.png) 
+![](hlsNote/131.png) 
+![](hlsNote/132.png) 
+![](hlsNote/133.png) 
+![](hlsNote/134.png) 
+要使用fifo接口，需要数组本身是先进先出这种流动方式的才行。
+![](hlsNote/135.png) 
+![](hlsNote/136.png) 
+![](hlsNote/137.png) 
+![](hlsNote/138.png) 
+![](hlsNote/139.png) 
+![](hlsNote/140.png) 
+![](hlsNote/141.png) 
+折中，约束使用单端口
+![](hlsNote/142.png) 
+![](hlsNote/143.png) 
+![](hlsNote/144.png) 
+约束使用单端口RAM
+![](hlsNote/145.png) 
+solution resource compare
+![](hlsNote/146.png) 
+![](hlsNote/147.png) 
+![](hlsNote/148.png) 
+![](hlsNote/149.png) 
+![](hlsNote/150.png) 
+![](hlsNote/151.png) 
+![](hlsNote/152.png) 
+![](hlsNote/153.png) 
+![](hlsNote/154.png) 
+![](hlsNote/155.png) 
+![](hlsNote/156.png) 
+![](hlsNote/157.png) 
+![](hlsNote/158.png) 
+![](hlsNote/159.png) 
+![](hlsNote/160.png) 
+![](hlsNote/161.png) 
+![](hlsNote/162.png) 
+![](hlsNote/163.png) 
+![](hlsNote/164.png) 
+![](hlsNote/165.png) 
+![](hlsNote/166.png) 
+![](hlsNote/167.png) 
+![](hlsNote/168.png) 
+![](hlsNote/169.png) 
+![](hlsNote/170.png) 
+
+
 
 
 
@@ -1169,6 +1423,142 @@ Sample code for line buffer declaration:
 ![](hlsNote/24.png)
 
 ![](hlsNote/25.png)
+
+手势区域截取，手势特征提取，手势识别，手势参数输出。
+
+**手势区域截取**
+**基于统计规律的手势识别**
+手势的基本特征主要有，手势的面积大小、手势的宽长比以及**手势部分与矩形面积的比值**
+
+
+# 基于FPGA 的手势识别系统
+
+**手势分割模块、手势特征提取模块、手型自适应模块和手势识别模块**
+
+![](hlsNote/50.png)
+
+![](hlsNote/51.png)
+
+![](hlsNote/52.png)
+
+![](hlsNote/53.png)
+
+![](hlsNote/54.png)
+
+![](hlsNote/55.png)
+
+![](hlsNote/56.png)
+
+![](hlsNote/57.png)
+面积周长比，有效面积特征作为初步识别的特征参量，最后提取五阶Hu矩特征
+![](hlsNote/58.png)
+
+![](hlsNote/59.png)
+
+![](hlsNote/60.png)
+
+![](hlsNote/61.png)
+
+
+# 基于FPGA 动态手势识别系统研究与实现
+
+![](hlsNote/67.png)
+
+![](hlsNote/68.png)
+
+![](hlsNote/69.png)
+
+![](hlsNote/70.png)
+
+![](hlsNote/71.png)
+
+![](hlsNote/72.png)
+
+![](hlsNote/73.png)
+
+![](hlsNote/74.png)
+
+![](hlsNote/75.png)
+
+>**对于二值图像**
+腐蚀：过滤无意义的小点，过滤效果与腐蚀窗口形状大小有关。
+膨胀：平滑边缘线，连接断裂的边缘线，
+开：先用腐蚀消除噪声点，再膨胀平滑物体的边缘
+这里作者使用了两次腐蚀和一次膨胀。
+
+![](hlsNote/76.png)
+
+![](hlsNote/77.png)
+
+如前所说，膨胀能平滑边缘，所以在Sobel边缘提取后可以使用膨胀来
+
+![](hlsNote/78.png)
+
+![](hlsNote/79.png)
+
+
+
+
+
+
+
+
+
+
+# 优化
+
+## 寻找合适的滤波窗口大小和迭代次数
+
+![](hlsNote/62.png)
+
+![](hlsNote/63.png)
+
+![](hlsNote/64.png)
+
+中值滤波窗口3 可行
+腐蚀窗口 5
+腐蚀迭代 3
+
+膨胀窗口 5
+膨胀迭代 5
+效果不错，尝试过了3333，可以再试试减少迭代次数
+腐蚀膨胀窗口越大，迭代次数越多对小目标效果越好
+这些其实效果都不好，仿真还行，生成ip核效果并不好，所以还是都用最小的值吧。
+
+![](hlsNote/65.png)
+
+![](hlsNote/66.png)
+
+
+## Hu不变矩
+对于一个提取出来的手势，我们需要有固定且唯一的特征来对其进行记录，且该特征不会受到手势的大小，旋转，平移而变化，且鲁棒性较好，所以此处引入Hu不变矩算法。
+
+>连续情况下，图像像素分布为f(x,y)，则图像的p+q阶不变矩（标准矩，普通矩）为：
+![](hlsNote/80.png)
+p+q阶中心矩为：
+![](hlsNote/81.png)
+其中矩心（x0, y0）为：
+![](hlsNote/82.png)
+
+>对于数字图像，引入适用于离散图像的Hu不变矩：
+![](hlsNote/83.png)
+式中p、q=0，1，2...
+
+直接用普通矩或中心矩进行特征表示，不能使特征同时具有平移、旋转和比例不变性，因此我们下面进行归一化。
+
+>归一化中心矩定义：
+![](hlsNote/84.png)
+利用归一化中心矩的话则可以同时拥有平移不变性和比例不变性。
+![](hlsNote/85.png)
+
+![](hlsNote/86.png)
+
+![](hlsNote/87.png)
+
+![](hlsNote/88.png)
+
+![](hlsNote/89.png)
+
 
 
 # Some Words
@@ -1212,7 +1602,7 @@ luminence    亮度
 
 
 manipulate   操纵
-
+mandatory    强制性的
 
 
 
@@ -1238,6 +1628,11 @@ register     寄存器，登记
 scalar       标量
 spatial      空间的 
 suppression  抑制
+subtract     减去
+saturate     饱和
+
+throghput    吞吐率
+
 
 
 
@@ -1252,6 +1647,25 @@ suppression  抑制
 
 通过修改版本号（原来为1.0，修改为2.0.0）解决问题，也可以插入补丁。
 参考[补丁](https://support.xilinx.com/s/article/76960?language=en_US)
+
+---
+
+[C++中typename关键字的使用方法和注意事项](http://hunkshi.github.io/2013/08/09/2013-08-09-cpp-typename-keyword-usage/)
+
+[头文件中能否进行函数的定义?](https://blog.csdn.net/M_jianjianjiao/article/details/84109955)
+
+首先要知道，stream数据是一种流数据，只能按顺序读取，并且不能读取第二次，它就如同水流一般向前行。对于HLS中的Stream数据来说，有输入就必须有输出，在testbench中赋予了stream一些数据但并没有全部读出的话意味着song data left over，而一个流数据读取两次的话，第二次肯定read while empty。这些可能会造成RTL hanging，在FPGA中则会形成dead lock。
+[Vivado HLS 2013.2: how to investigate WARNING: Hls::stream 'hls::stream.XX' is read while empty, or WARNING: Hls::stream 'hls::stream<XX>.2' contains leftover data, which may result in RTL simulation hanging](https://support.xilinx.com/s/article/57876?language=en_US)
+[C simulation Warning](https://support.xilinx.com/s/question/0D52E00006hpaJeSAI/c-simulation-warning?language=en_US)
+
+这个问题与帧差法两个输入数据流的缓存有关。
+https://support.xilinx.com/s/question/0D52E00006hpe5LSAQ/how-to-subtract-hlserode-output-from-the-hlsduplicate-output-to-create-boundries?language=en_US
+[帧差法检测运动物体](https://support.xilinx.com/s/question/0D52E00006hpLJZSA2/%E5%B8%A7%E5%B7%AE%E6%B3%95%E6%A3%80%E6%B5%8B%E8%BF%90%E5%8A%A8%E7%89%A9%E4%BD%93?language=en_US)
+
+
+
+
+
 
 
 
