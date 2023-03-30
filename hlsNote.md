@@ -457,6 +457,27 @@ AXI4 -Lite 接口是简化版的 AXI4 接口，用于较少数据量的存储映
 以上参考自[基于xfOpenCV的中值滤波实验](https://www.amobbs.com/thread-5740463-1-1.html)
 
 
+## 基于BRAM的PS与PL的数据交互
+
+在 ZYNQ SOC 开发过程中，PL和PS之间经常需要做数据交互。对于传输速度要求较高、数据量大、地址连续的场合，可以通过 AXI DMA 来完成。而对于数据量较少、地址不连续、长度不规则的情况，此时 DMA 便不再适用了。针对这种情况可以通过 BRAM 来进行数据的交互。
+BRAM（Block RAM）是 **PL 部分的存储器阵列**，PS和PL通过对BRAM进行读写操作，来实现数据的交互。在PL中，通过输出时钟、地址、读写控制等信号来对 BRAM 进行读写操作，而在 PS 中，处理器并不需要直接驱动 BRAM 的端口，而是通过 AXI BRAM 控制器来对 BRAM 进行读写操作。 AXI BRAM 控制器是集成在 Vivado 设计软件中的软核，可以配置成 AXI4 lite 接口模式或者 AXI4 接口模式。
+AXI4接口模式的BRAM控制器支持数据位宽为32、64、128、512、1024位，而AXI4-Lite接口仅支持32位数据位宽。AXI BRAM控制器作为AXI总线的从接口与AXI主接口实现互联来对BRAM进行读写操作。针对不同应用场合，该IP核支持单次传输与突发传输两种方式。
+
+![](hlsNote/159.png)
+
+PS 端的M_ AXI_GP0作为主端口与PL端的AXI BRAM控制器IP核和PL读BRAM IP核（pl_bram_rd）通过AXI4总线进行连接.AXI BRAM控制器作为PS端读写BRAM的IP核，pl_bram_rd是自定义IP核用来实现PL端读取BRAM数据的功能，同时，PS端通过AXI总线来配置该IP核（pl_bram_rd）**读取BRAM的起始地址和个数**等。
+
+
+
+
+
+
+
+
+
+
+
+
 # 基础
 
 ## VDMA
@@ -1220,7 +1241,7 @@ void accumulate_accel(ap_uint<INPUT_PTR_WIDTH>* img_in1,
 
 ## 看博客
 
-[接口，优化指令]https://blog.csdn.net/xzs520xzs/article/details/126673128
+[接口，优化指令](https://blog.csdn.net/xzs520xzs/article/details/126673128)
 
 在vivado HLS软件右侧中有个Directive栏（如果没有可以在功能栏中的window将其显示出来），里边列出了所有的**变量、函数、循环**结构，右键点击就可以对其进行配置；简单讲解一下如何进行配置，对于循环结构体，一般选择**unroll**（展开循环），可以自己设定展开的因子factor；对于函数，为了提高程序的并行处理能力，可以右键选择**PIPELINE**；对于数组，可以设置为**ARRAY_PARTITION**，数组维数根据需求设置。每一个优化的方案都可以保存在一个solution中，可以创建多个solution。
 
@@ -1277,6 +1298,41 @@ void image_filter(AXI_STREAM& video_in, AXI_STREAM& video_out, int rows, int col
 所以，**img_1_1需要具备足够大的FIFO depth**。
 `#pragma HLS stream depth=20000 variable=img_1_1.data_stream`
 这条约束，指定了**Mat对象的内部存储数组（data_stream）**，显式地被HLS理解为**FIFO（stream）**，并且深度为**20000**。
+
+
+[HLS学习（二）Using AXI4 Interfaces](https://blog.csdn.net/crazyeden/article/details/86594027)
+在这里学到了把数组用于顶层函数的形参，并且指定为m_axi的接口。
+![](hlsNote/160.png) 
+
+
+[Sobel 滤波器（Vitis 视觉库）在 Pynq-Z 板上的实现](https://discuss.pynq.io/t/sobel-filter-vitis-vision-library-implementation-on-pynq-z-board/3753)
+
+
+
+
+
+
+
+
+
+
+
+### Hu不变矩
+[Hu不变矩原理及opencv实现](https://blog.csdn.net/qq_26898461/article/details/47123405)
+
+
+
+### PS与PL数据交互
+[有人想在HLS中访问DDR](https://support.xilinx.com/s/question/0D52E00006hppE0SAI/hls-%E5%9B%A0%E4%B8%BA%E7%94%A8%E5%88%B0%E7%9A%84%E6%95%B0%E7%BB%84%E5%A4%AA%E5%A4%A7%E5%AF%BC%E8%87%B4bram%E4%B8%8D%E5%A4%9F%E7%94%A8%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8ddr%E5%A4%96%E6%8E%A5%E5%86%85%E5%AD%98%E5%91%A2?language=en_US)
+
+提到：将数组作为HLS函数参数，然后将其声明为AXI接口，再将接口连接至MIG IP核，就可以访问DDR中的数据了
+
+
+
+
+
+
+
 
 
 
@@ -1359,20 +1415,25 @@ HLS是不支持递归的
 ![](hlsNote/145.png) 
 solution resource compare
 ![](hlsNote/146.png) 
+
+**开始讲数组**
 ![](hlsNote/147.png) 
 ![](hlsNote/148.png) 
 ![](hlsNote/149.png) 
+register分割是完全并行的
 ![](hlsNote/150.png) 
 ![](hlsNote/151.png) 
+指定为单端口RAM，
 ![](hlsNote/152.png) 
 ![](hlsNote/153.png) 
 ![](hlsNote/154.png) 
 ![](hlsNote/155.png) 
 ![](hlsNote/156.png) 
 ![](hlsNote/157.png) 
+ARRAY_RESHAPE是针对一个数组的，是ARRAY_PARTITION和ARRAY_MAP的结合，既减少了BRAM的使用，也继承了ARRAY_MAP的效用即并行处理数据。
 ![](hlsNote/158.png) 
-![](hlsNote/159.png) 
-![](hlsNote/160.png) 
+
+
 ![](hlsNote/161.png) 
 ![](hlsNote/162.png) 
 ![](hlsNote/163.png) 
