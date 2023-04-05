@@ -1095,7 +1095,7 @@ The Vitis Vision library is a set of **select OpenCV functions** optimized for Z
 
 
 
->看包含库函数的后文件及其对应的文件夹名，table是重点
+>看包含库函数的头文件及其对应的文件夹名，table是重点
 [Using the Vitis vision Library](https://docs.xilinx.com/r/en-US/Vitis_Libraries/vision/overview.html_1_3)
 ![](hlsNote/28.png)
 文件夹common和core包含库函数所需要的基础设施，包括`basic functions, Mat class, and macros`，库函数按类分成四个文件夹：`features, video, dnn, and imgproc `，为了使用这些库函数，必须在VitisProject中添加文件夹的路径，之后便可以include相关的头文件，应该是要添加文件夹的路径到CFlags。
@@ -1204,41 +1204,6 @@ Sample code for line buffer declaration:
 这个table总结了从HLS Video库移植到Vitis Vision库中的视频处理函数。
 
 
-## 优化指令
-
-\#pragma HLS RESOURCE variable=input_stream core=AXIS metadata="-bus_bundle INPUT_STREAM"
-\#pragma HLS RESOURCE variable=output_stream core=AXIS metadata="-bus_bundle OUTPUT_STREAM"
-\#pragma HLS INTERFACE ap_ctrl_none port=return
-
-
-void VID_PROC(AXI_STREAM &video_in, AXI_STREAM &video_out, int rows, int cols)
-\#pragma HLS INTERFACE axis port=video_in bundle=INPUT_STREAM
-\#pragma HLS INTERFACE axis port=video_out bundle=OUTPUT_STREAM
-\#pragma HLS INTERFACE s_axilite port=rows bundle=CONTROL_BUS offset=0x14
-\#pragma HLS INTERFACE s_axilite port=cols bundle=CONTROL_BUS offset=0x1c
-\#pragma HLS INTERFACE s_axilite port=return bundle=CONTROL_BUS
-\#pragma HLS dataflow
-\#pragma HLS stream depth=20000 variable=OUT2.data_stream
-
-void accumulate_accel(ap_uint<INPUT_PTR_WIDTH>* img_in1,
-                      ap_uint<INPUT_PTR_WIDTH>* img_in2,
-                      ap_uint<OUTPUT_PTR_WIDTH>* img_out,
-                      int height,
-                      int width) 
-\#pragma HLS INTERFACE m_axi port=img_in1 offset=slave bundle=gmem0 depth=__XF_DEPTH
-\#pragma HLS INTERFACE m_axi port=img_in2 offset=slave bundle=gmem1 depth=__XF_DEPTH
-\#pragma HLS INTERFACE m_axi port=img_out offset=slave bundle=gmem2 depth=__XF_DEPTH
-\#pragma HLS INTERFACE s_axilite port=return bundle=control
-
-\#pragma HLS INTERFACE axis port=video_in bundle=INPUT_STREAM
-\#pragma HLS INTERFACE axis port=video_out bundle=OUTPUT_STREAM
-\#pragma HLS INTERFACE s_axilite port=return bundle=CONTROL_BUS
-\#pragma HLS INTERFACE s_axilite port=rows bundle=CONTROL_BUS offset=0x14
-\#pragma HLS INTERFACE s_axilite port=cols bundle=CONTROL_BUS offset=0x1C
-
-
-
-
 ## 看博客
 
 [接口，优化指令](https://blog.csdn.net/xzs520xzs/article/details/126673128)
@@ -1318,7 +1283,55 @@ void image_filter(AXI_STREAM& video_in, AXI_STREAM& video_out, int rows, int col
 
 
 ### Hu不变矩
+
+对于一个提取出来的手势，我们需要有固定且唯一的特征来对其进行记录，且该特征不会受到手势的大小，旋转，平移而变化，且鲁棒性较好，所以此处引入Hu不变矩算法。
+
+>连续情况下，图像像素分布为f(x,y)，则图像的p+q阶不变矩（标准矩，普通矩）为：
+![](hlsNote/80.png)
+p+q阶中心矩为：
+![](hlsNote/81.png)
+其中矩心（x0, y0）为：
+![](hlsNote/82.png)
+
+>对于数字图像，引入适用于离散图像的Hu不变矩：
+![](hlsNote/83.png)
+式中p、q=0，1，2...
+
+直接用普通矩或中心矩进行特征表示，不能使特征同时具有平移、旋转和比例不变性，因此我们下面进行归一化。
+
+>归一化中心矩定义：
+![](hlsNote/84.png)
+利用归一化中心矩的话则可以同时拥有平移不变性和比例不变性。
+![](hlsNote/85.png)
+
+![](hlsNote/86.png)
+
+![](hlsNote/87.png)
+
+![](hlsNote/88.png)
+
+![](hlsNote/89.png)
+
+
 [Hu不变矩原理及opencv实现](https://blog.csdn.net/qq_26898461/article/details/47123405)
+
+[基于FPGA的手势识别系统设计](http://gezhilai.com/2021/07/09/%E5%9F%BA%E4%BA%8EFPGA%E7%9A%84%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/)
+
+
+
+#### 仿真（matlab/opencv）
+
+|    SPACE    | 一指 | 二指 | 三指 | 四指  | 五指残缺 | 拳头 | 五指完整 |
+|    :---:    | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| MATLAB_M[0] |   21572   |   22686   |   21016   |   18895   |   15173   |   13516   |   16360   |
+| OPENCV_M[0] |   21571   |   22686   |   21016   |   18895   |   15156   |   13498   |  16360  |
+| MATLAB_M[1] |   17.6367   |   19.2464   |   15.5429   |   10.5509   |   4.0185   |   3.4057   |   6.7028  |
+| OPENCV_M[1] |   17   |   19   |   15   |   10   |   4   |   3   |   6  |
+
+
+
+
+
 
 
 
@@ -1326,12 +1339,6 @@ void image_filter(AXI_STREAM& video_in, AXI_STREAM& video_out, int rows, int col
 [有人想在HLS中访问DDR](https://support.xilinx.com/s/question/0D52E00006hppE0SAI/hls-%E5%9B%A0%E4%B8%BA%E7%94%A8%E5%88%B0%E7%9A%84%E6%95%B0%E7%BB%84%E5%A4%AA%E5%A4%A7%E5%AF%BC%E8%87%B4bram%E4%B8%8D%E5%A4%9F%E7%94%A8%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8ddr%E5%A4%96%E6%8E%A5%E5%86%85%E5%AD%98%E5%91%A2?language=en_US)
 
 提到：将数组作为HLS函数参数，然后将其声明为AXI接口，再将接口连接至MIG IP核，就可以访问DDR中的数据了
-
-
-
-
-
-
 
 
 
@@ -1346,106 +1353,6 @@ xf::cv::Mat中存储像素数据的是成员是data，data定义如下：
 
 这里的T是像素数据类型，如XF_8UC3，DATATYPE是XF_TNAME(T, NPC)的别名，从前面的Manipulating Data Type章节了解到XF_TNAME(T, NPC)会解析成ap_uint<像素宽度*通道数*NPC>，如XF_TNAME(XF_8UC3, XF_NPPC1)解析成ap_uint<8*3*1>=ap_uint<24>，因此我们可以推导出DATATYPE的类型。
 接着看到_DATATYPE的定义，虽然定义复杂但我们可以逐层推断，conditional相比是条件判断，程序中使用流模型所以XFCVDEPTH为默认值也就是2，进入第二层条件判断可以发现_DATATYPE被定义成了hls::stream<DATATYPE, XFCVDEPTH>::type::type，重点关注hls::stream<DATATYPE, XFCVDEPTH>。所以data也是一种流数据模型。
-
-
-
-## 看课
-
-[learn from here](https://www.bilibili.com/video/BV1bt41187RW/?p=1&vd_source=7b41839c0bc8f13071f01977ba9e14de)
-
-throghput 吞吐率
-注意数据位宽，原则是大数据不能溢出，小数据不能损失，尤其用定点数的时候。
-HLS是不支持递归的
-
-![](hlsNote/114.png)
-![](hlsNote/115.png)
-![](hlsNote/116.png)
-![](hlsNote/117.png)
-![](hlsNote/118.png)
-![](hlsNote/119.png)
-![](hlsNote/120.png) 
-![](hlsNote/93.png)
-![](hlsNote/94.png)
-![](hlsNote/95.png)
-![](hlsNote/96.png)
-![](hlsNote/97.png)
-![](hlsNote/98.png)
-![](hlsNote/99.png)
-![](hlsNote/100.png)
-![](hlsNote/101.png)
-![](hlsNote/102.png)
-![](hlsNote/103.png)
-![](hlsNote/104.png)
-![](hlsNote/105.png)
-![](hlsNote/106.png)
-![](hlsNote/107.png)
-![](hlsNote/108.png)
-![](hlsNote/109.png)
-![](hlsNote/110.png)
-![](hlsNote/111.png)
-![](hlsNote/112.png) 
-![](hlsNote/113.png)
-
-![](hlsNote/122.png) 
-![](hlsNote/123.png) 
-![](hlsNote/124.png) 
-![](hlsNote/125.png) 
-![](hlsNote/126.png) 
-![](hlsNote/127.png) 
-![](hlsNote/128.png) 
-![](hlsNote/129.png) 
-![](hlsNote/130.png) 
-![](hlsNote/131.png) 
-![](hlsNote/132.png) 
-![](hlsNote/133.png) 
-![](hlsNote/134.png) 
-要使用fifo接口，需要数组本身是先进先出这种流动方式的才行。
-![](hlsNote/135.png) 
-![](hlsNote/136.png) 
-![](hlsNote/137.png) 
-![](hlsNote/138.png) 
-![](hlsNote/139.png) 
-![](hlsNote/140.png) 
-![](hlsNote/141.png) 
-折中，约束使用单端口
-![](hlsNote/142.png) 
-![](hlsNote/143.png) 
-![](hlsNote/144.png) 
-约束使用单端口RAM
-![](hlsNote/145.png) 
-solution resource compare
-![](hlsNote/146.png) 
-
-**开始讲数组**
-![](hlsNote/147.png) 
-![](hlsNote/148.png) 
-![](hlsNote/149.png) 
-register分割是完全并行的
-![](hlsNote/150.png) 
-![](hlsNote/151.png) 
-指定为单端口RAM，
-![](hlsNote/152.png) 
-![](hlsNote/153.png) 
-![](hlsNote/154.png) 
-![](hlsNote/155.png) 
-![](hlsNote/156.png) 
-![](hlsNote/157.png) 
-ARRAY_RESHAPE是针对一个数组的，是ARRAY_PARTITION和ARRAY_MAP的结合，既减少了BRAM的使用，也继承了ARRAY_MAP的效用即并行处理数据。
-![](hlsNote/158.png) 
-
-
-![](hlsNote/161.png) 
-![](hlsNote/162.png) 
-![](hlsNote/163.png) 
-![](hlsNote/164.png) 
-![](hlsNote/165.png) 
-![](hlsNote/166.png) 
-![](hlsNote/167.png) 
-![](hlsNote/168.png) 
-![](hlsNote/169.png) 
-![](hlsNote/170.png) 
-
-
 
 
 
@@ -1566,59 +1473,124 @@ ARRAY_RESHAPE是针对一个数组的，是ARRAY_PARTITION和ARRAY_MAP的结合�
 
 
 
-# 优化
+# 论文
 
-## 寻找合适的滤波窗口大小和迭代次数
+## 论文要求
 
-![](hlsNote/62.png)
+### 第四章 
 
-![](hlsNote/63.png)
-
-![](hlsNote/64.png)
-
-中值滤波窗口3 可行
-腐蚀窗口 5
-腐蚀迭代 3
-
-膨胀窗口 5
-膨胀迭代 5
-效果不错，尝试过了3333，可以再试试减少迭代次数
-腐蚀膨胀窗口越大，迭代次数越多对小目标效果越好
-这些其实效果都不好，仿真还行，生成ip核效果并不好，所以还是都用最小的值吧。
-
-![](hlsNote/65.png)
-
-![](hlsNote/66.png)
+**第十九条：**题目必须有充分的资料、文献、数据及指定的外文资料做支撑且可查阅。在毕业设计（论文）过程中，**必须完成至少10000 单词的外文资料翻译任务**；要有使用计算机和实验分析等过程。
 
 
-## Hu不变矩
-对于一个提取出来的手势，我们需要有固定且唯一的特征来对其进行记录，且该特征不会受到手势的大小，旋转，平移而变化，且鲁棒性较好，所以此处引入Hu不变矩算法。
+### 第八章 论文
 
->连续情况下，图像像素分布为f(x,y)，则图像的p+q阶不变矩（标准矩，普通矩）为：
-![](hlsNote/80.png)
-p+q阶中心矩为：
-![](hlsNote/81.png)
-其中矩心（x0, y0）为：
-![](hlsNote/82.png)
+**第三十二条：**
+论文撰写应简明扼要，文理通顺，字迹工整，章节层次分明，图表清晰规范。使用的符号和术语必须规范统一，引用的公式定理及参考资料，须注明出处。所有公式及绘制的工程图均须进行编号，工程图应按国家标准绘制。
 
->对于数字图像，引入适用于离散图像的Hu不变矩：
-![](hlsNote/83.png)
-式中p、q=0，1，2...
+**第三十三条：**
+论文全文字数不得少于15000 字；论文是由中英文摘要、目录、引言、正文、结
+论、参考文献和附录等部分组成；中文摘要不得少于300 字，英文摘要不少于300 个单词；**引言**包括问题的提出及背景、国内外现状、前人所做的结果等；论文正文包括方案设计、解决的问题、测试实验结果、最后完成情况等。
 
-直接用普通矩或中心矩进行特征表示，不能使特征同时具有平移、旋转和比例不变性，因此我们下面进行归一化。
+**第三十四条：**
+论文书写及装订格式必须严格按要求进行，详细说明见《西安电子科技
+大学本科生毕业设计（论文）撰写规范》。
 
->归一化中心矩定义：
-![](hlsNote/84.png)
-利用归一化中心矩的话则可以同时拥有平移不变性和比例不变性。
-![](hlsNote/85.png)
+**第三十五条：**
+软件成果必须有软件技术文件，成果的处理按照导师的意见办理。
 
-![](hlsNote/86.png)
 
-![](hlsNote/87.png)
+### 第九章 盲审
 
-![](hlsNote/88.png)
+所有公布抽查的盲审论文一律要求进行“查重抽检”，各学院在提交盲审论文资料的同时需提交“查重抽检报告”，报告中文字复制比≤30%为合格，若文字复制比>30%，则该论文直接判定为重做。
 
-![](hlsNote/89.png)
+盲审结果分合格、适当修改、大量修改、重做等4 个等级评判。学生根据盲审意见进
+行修改，相关修改信息放入论文中。
+盲审结果为合格的论文，可直接参加答辩。
+对于要求适当修改的论文，学生需填写《西安电子科技大学本科生毕业设计（论
+文）修改说明》，由导师重审后，在修改说明上签字，方可参加答辩。
+对于要求大量修改的论文，学生填写修改说明，导师重审、签字，最后由院（系）
+重新审核后方可参加答辩。
+要求重做的论文，验收答辩工作将延期进行。
+
+
+### 第十章 答辩
+
+答辩小组在答辩前要认真评阅学生的论文，验收软硬件成果，提出的疑难问题
+要提前通知学生进行准备。
+
+答辩所提出的问题应为毕业设计的关键问题，如毕业设计（论文）涉及的相关
+基础理论、基本知识、设计和计算方法、实验方法、测试方法、程序编写方法、操作步骤及考核其独立工作能力等问题，力求全面地检查学生的实际水平。
+
+答辩时，答辩委员要积极提问。答辩时间每生不少于30 分钟，其中个人报告时
+间为15～20 分钟。
+
+各院系推荐上报的优秀论文必须经过院（系）答辩委员会组织的第二次答辩，
+以第二次答辩的评定结果作为最终推荐意见。
+
+
+### 第十一章 考核及成绩评定
+
+答辩程序和要求：
+（一）学生用15-20 分钟时间简要报告毕业设计（论文）的主要内容，包括：
+1. 课题的任务、目的和意义。
+2. 所采用的主要原始资料或指导文献。
+3. 设计（论文）的基本内容及主要方法。
+4. 设计（论文）的价值。
+（二）提问和回答约10 分钟，提问内容主要包括：
+1. 与课题有关的基本理论、方法和原理。
+2. 毕业设计（论文）中要求进一步说明的问题。
+3. 考察、鉴别学生独立工作能力的问题。
+
+（一）[优秀] 学习态度认真、工作努力；题目有一定的难度，在某个方面有创新性
+或新见解，较好地掌握本专业的基础理论、专业知识、基本技能；独立工作能力较强，能
+顺利阅读外文资料并按要求完成外文翻译，译文准确；论文结构严谨，逻辑性强、理论分
+析与计算正确，实验方案合理，实验数据准确可靠，对理论的验证性强；答辩时能简明扼
+要、重点突出地阐述论文的主要内容，能准确流利地回答各种问题；在整个毕业设计过程
+中，能遵守纪律和各种规章制度，无责任事故。
+
+
+### 第十四章
+
+论文检测
+报告中文字复制比应≤30%，推荐校级的优秀毕业设计（论文）文字复制比应不超过10%。
+
+
+### 第十五章
+
+上报的优秀论文需进行查重，论文文字复制比应≤20%。
+
+
+## 论文撰写规范
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
