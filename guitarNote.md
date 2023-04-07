@@ -8,13 +8,15 @@ hidden: false
 date: 2023-01-01 19:53:18
 ---
 
+"抚琴动操，欲令众山皆响"
+
+<!--more-->
+
 [Hans Zimmer - INTERSTELLAR⎪12 STRING FINGERSTYLE GUITAR](https://www.youtube.com/watch?v=IuEEEwgdAZs&list=PLIaxneP_b7KEH7oukcSTE7Y7ZMUT2stkj&index=2)
 
 [INTERSTELLAR THEME (Epic Baritone Guitar) [Fingerstyle cover]](https://www.youtube.com/watch?v=DGa4Xv_tcjE&list=PLIaxneP_b7KEH7oukcSTE7Y7ZMUT2stkj&index=7)
 
 [Interstellar Docking Scene Theme on guitar](https://www.youtube.com/watch?v=zYnZc-5NV8k&list=PLIaxneP_b7KEH7oukcSTE7Y7ZMUT2stkj&index=5)
-
-<!--more-->
 
 # 入门
 
