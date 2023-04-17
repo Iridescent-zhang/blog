@@ -1,9 +1,9 @@
 ---
 title: guitarNote
 categories:
-  - null
+  - Interest
 tags:
-  - null
+  - Guitar
 hidden: false
 date: 2023-01-01 19:53:18
 ---

@@ -5,7 +5,7 @@ categories:
   - FPGA
 tags:
   - HLS
-  - FPGA
+  - 毕业设计
 hidden: false
 ---
 
@@ -1707,29 +1707,38 @@ HLS先验知识：HLS原理，HLS设计流程，vision library介绍（相当于
 
 
 ## 修改
-#pragma HLS ARRAY_PARTITION dim=1 factor=300 type=block variable=Array：
 
-#pragma HLS ARRAY_MAP：
+\#pragma HLS ARRAY_PARTITION dim=1 factor=300 type=block variable=Array：
 
-#pragma HLS ARRAY_RESHAPE dim=1 factor=300 type=block variable=Array：
+\#pragma HLS ARRAY_MAP：
 
-#pragma HLS UNROLL：
+\#pragma HLS ARRAY_RESHAPE dim=1 factor=300 type=block variable=Array：
 
-#pragma HLS INTERFACE mode=m_axi bundle=RESULT depth=50 port=result offset=slave：
+\#pragma HLS UNROLL：
 
-#pragma HLS LOOP_FLATTEN：
+\#pragma HLS INTERFACE mode=m_axi bundle=RESULT depth=50 port=result offset=slave：
 
-#pragma HLS PIPELINE II=1 rewind：
+\#pragma HLS LOOP_FLATTEN：
 
-#pragma HLS DATAFLOW
+\#pragma HLS PIPELINE II=1 rewind：
+
+\#pragma HLS DATAFLOW
 
 HLS LOOP_FLATTEN与HLS PIPELINE II=1 rewind
 
 SYED的删除了DOI号，其它还有好几个IEEE的没有页码，后面再改吧
 
 
+导入参考文献：
+1. 可以用本地的pdf文件来导入
+2. 引用格式采用endnote
 
+[EndNote专题: 导入文献](https://sustech.libguides.com/c.php?g=929626&p=6717028)
+[EndNote专题: 引用文献](https://sustech.libguides.com/c.php?g=929626&p=6717030)
 
+[论文写作技巧 : Endnote参考文献统一输出格式](https://blog.csdn.net/dl962454/article/details/122600980)
+
+[EndNote详细使用教程](https://zhuanlan.zhihu.com/p/114057977)
 
 
 

@@ -1,9 +1,9 @@
 ---
 title: C++Note
 categories:
-  - null
+  - Language
 tags:
-  - null
+  - C++
 hidden: false
 date: 2023-02-22 16:20:11
 ---

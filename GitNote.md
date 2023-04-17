@@ -2,9 +2,9 @@
 title: 学习Git
 date: 2022-09-19 16:47:52
 categories: 
-  - Git
+  - Language
 tags:
-  - git
+  - Git
 ---
 
 ## Git

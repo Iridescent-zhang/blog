@@ -2,7 +2,9 @@
 title: pynqNote
 date: 2022-10-25 11:15:10
 categories:
+  - FPGA
 tags:
+  - PYNQ
 ---
 
 PYNQ is an open-source project from Xilinx® that makes it easier to use Xilinx platforms.

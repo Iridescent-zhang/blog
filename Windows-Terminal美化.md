@@ -2,9 +2,9 @@
 title: Windows-Terminal美化
 date: 2022-10-09 10:43:08
 categories:
-  - shell  
+  - Shell  
 tags:
-  - Windows
+  - Powershell
 ---
 
 **颜值就是生产力**

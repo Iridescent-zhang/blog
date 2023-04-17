@@ -2,16 +2,20 @@
 title: latexNote
 date: 2022-09-23 18:24:56
 categories: 
-  - LaTeX
+  - Language
 tags:
   - LaTeX
 ---
+
+LaTeX是一个让你的文档看起来更专业的排版系统
+
+<!--more-->
 
 ## 配置vscode texlive SumatraPDF环境
 
 ### 关于 TeX Live
 所谓 TeX 发行，也叫 TeX 发行版、**TeX 系统**或者 TeX 套装，指的是包括 **TeX 系统的各种可执行程序，以及他们执行时需要的一些辅助程序和宏包文档** 的集合。
-<!--more-->
+
 TeX Live 是 TUG (TeX User Group) 维护和发布的 TeX 系统，可说是「官方」的 TeX 系统。我们推荐任何阶段的 TeX 用户，都尽可能使用 TeXLive，以保持在跨操作系统平台、跨用户的一致性。
 Texlive 是 LaTex 的编译环境，提供了大量的脚本和宏包供我们使用，并且有很方便的宏包管理器可以下载更新宏包，十分方便。
 

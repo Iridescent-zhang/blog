@@ -2,7 +2,7 @@
 title: 学习Markdown
 date: 2022-09-06 16:37:25
 categories:
-  - Programing
+  - Language
 tags:
   - Markdown
 ---

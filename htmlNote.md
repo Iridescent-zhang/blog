@@ -2,7 +2,9 @@
 title: 学习HTML
 date: 2022-09-06 20:24:20
 categories:
+  - Language
 tags:
+  - HTML
 ---
 
 ## Learning Record

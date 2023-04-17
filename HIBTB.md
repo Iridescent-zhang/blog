@@ -7,6 +7,7 @@ tags:
   - hexo
   - next
 ---
+
 ## How I bulid this blog
 **hexo**是一个应用非常广泛的，快速且高效的博客框架，我使用的主题是[next](https://github.com/theme-next/hexo-theme-next)，网上配置教程非常多，过程繁琐但不难，需要注意的一点是大多数教程是旧版*next*（仍作参考），新版*next*有一些不同的地方，修改除_config.yml以外的文件时做好备份。
 
