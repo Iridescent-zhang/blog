@@ -155,6 +155,10 @@ moon_menu:
 > 这篇文章很厉害，可以好好看看
 > `npm install hexo-image-link --save` 安装插件
 
+
+
+2023/9/29 电脑被黑客攻击后重装系统 重新布置blog
+设置ssh密钥为123
 ### 配置hexo next详细教程
 [主要参考](https://minyuchengmin.github.io/2020/02/26/hexo-bo-ke-xin-ban-next-zhu-ti-da-jian/#valine-comments)
 [含个人域名重定向和HTTPS](https://blog.shijy16.cn/2021/05/13/%E9%85%8D%E7%BD%AE/Hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)

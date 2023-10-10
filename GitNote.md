@@ -291,3 +291,5 @@ git pull <remote> dev将获取remote/dev分支，并将其合并到您当前的�
 [合并冲突](https://blog.csdn.net/nonfuxinyang/article/details/77206486)
 [Runoob-Git](https://www.runoob.com/git/git-tutorial.html)
 [pull request](https://chinese.freecodecamp.org/news/how-to-make-your-first-pull-request-on-github/)
+
+[当前文件夹不安全](https://www.aspirantzhang.com/network/git-fatal-unsafe-repository.html)

@@ -1879,8 +1879,3 @@ https://support.xilinx.com/s/question/0D52E00006hpe5LSAQ/how-to-subtract-hlserod
 用台湾ip可以进chatgpt注册网页
 
 [Vitis Vision Library](https://github.com/Xilinx/Vitis_Libraries/tree/master/vision)
-
-
-# 智慧团建
-
-智慧团建密码一定是：Zlc350628.
