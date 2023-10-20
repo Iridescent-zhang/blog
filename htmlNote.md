@@ -7,7 +7,8 @@ tags:
   - HTML
 ---
 
-## Learning Record
+## HTML
+
 超文本标记语言HTML is short for "HyperText Markup Language"，是一种用于创建网页的标准标记语言，可以使用HTML来建立自己的Web站点，HTML文档运行在浏览器上，由浏览器解析。
 <!--more-->
 - HTML 不是一种编程语言，而是一种标记语言;
@@ -27,6 +28,7 @@ Web浏览器读取HTML文档，并将其作为网页显示，浏览器并不是�
 src、href都是属性
 
 空元素是没有内容的元素，在开始标签中关闭，通过在开始标签中添加斜杠，例如\<br/>是关闭空元素的正确方法，包括img元素也是这样；
+
 
 ### 属性
 HTML元素添设置属性来添加附加信息，属性一般描述在开始标签，通常以名称="值"的形式出现（name="value"）。

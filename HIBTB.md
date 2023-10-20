@@ -5,7 +5,6 @@ categories:
   - blog
 tags:
   - hexo
-  - next
 ---
 
 ## How I bulid this blog

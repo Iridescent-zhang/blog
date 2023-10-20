@@ -2,12 +2,13 @@
 title: 学习Git
 date: 2022-09-19 16:47:52
 categories: 
-  - Language
+  - Git
 tags:
   - Git
 ---
 
 ## Git
+
 Git 是一个开源的**分布式-版本控制系统**，用于敏捷高效地处理任何或小或大的项目。
 Git 与常用的版本控制工具 CVS, Subversion（SVN）等不同，它采用了分布式版本库的方式，不必服务器端软件支持。
 Git 不仅仅是个版本控制系统，它也是个内容管理系统(CMS)，工作管理系统等。

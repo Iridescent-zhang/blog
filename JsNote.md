@@ -7,11 +7,13 @@ tags:
   - JS
 ---
 
+**JavaScript**
+
+<!--more-->
+
 JavaScript 是脚本语言
 JavaScript 是可插入 HTML 页面的编程代码。
 JavaScript 插入 HTML 页面后，可由所有的现代浏览器执行。
-
-<!--more-->
 
 在HTML 输出流中使用 document.write，相当于在原有html代码中添加一串html代码。而如果在文档加载后使用（如使用函数，即函数中含有document.write，并且调用这个函数），会覆盖整个文档。
 

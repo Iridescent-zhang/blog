@@ -8,7 +8,7 @@ hidden: false
 date: 2023-04-18 19:01:57
 ---
 
-学习Ubuntu
+**Linux is not Unix**
 
 <!--more-->
 

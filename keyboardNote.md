@@ -1,7 +1,7 @@
 ---
 title: keyboardNote
 categories:
-  - Keyboard
+  - Interest
 tags:
   - Keyboard
 hidden: true
